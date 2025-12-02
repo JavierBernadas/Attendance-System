@@ -1,0 +1,20 @@
+frontend/   (your React app root folder)
+│── public/               # Static files (favicon, index.html, etc.)
+│── src/
+│   ├── assets/           # Images, icons, fonts
+│   ├── components/       # Reusable UI pieces (Buttons, Navbar, etc.)
+│   ├── pages/            # Full pages/screens (Home, Login, Dashboard)
+│   ├── layouts/          # Common layouts (Navbar + Sidebar + Content)
+│   ├── hooks/            # Custom React hooks
+│   ├── context/          # React Context (Auth, Theme, etc.)
+│   ├── services/         # API calls (Axios/fetch functions)
+│   ├── utils/            # Helper functions
+│   ├── App.jsx           # Main App component
+│   ├── main.jsx          # ReactDOM entry
+│   └── index.css         # Global styles
+│
+└── package.json
+
+
+// Short for Creating a Components in REACT ! 
+rafce, rfc, rfce

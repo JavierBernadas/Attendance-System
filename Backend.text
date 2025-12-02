@@ -1,0 +1,11 @@
+backend/    (your Node.js app root folder)
+│── src/
+│   ├── config/          # DB connection, environment variables
+│   ├── controllers/     # Functions for handling requests
+│   ├── models/          # Mongoose schemas
+│   ├── routes/          # Express routes
+│   ├── middleware/      # Auth, error handling
+│   ├── utils/           # Helper functions
+│   ├── server.js        # App entry point
+│
+└── package.json

@@ -1,0 +1,49 @@
+Task: 
+
+API-Attendance
+Create API Attendance Checkin - Done 
+Create API Attendance Checkout -
+Create API Attendance History -  
+
+Application Icons - ! ! !   
+Change to - https://hugeicons.com/
+User Profile Design - need to change 
+Ongoing = User Table - Make sure pagination is working
+           - Add filter Names / Date Created
+Leave Page - Need more Enhancement Design
+
+User Schema  - Working ! ! !
+SUPER ADMIN - DO ALL 
+ADMIN - can create manager/user
+MANAGER - can create user
+USER - none
+Done - Creating This in Casle Rule Check and Read / Uderstand Code works ! ! !
+
+-- Filter for USER - MANAGER ! ! !
+
+TESTiNG API ! 
+- Merge Auth Check Token and Role Checking ! ! ! - Done ! 
+Post User
+- All good !  - working with the data   ( Created By ) - Done
+- Login User ! - Done
+- User Get Data ( User's Data Assinged 
+By them or who created them only get the data 
+/ Super admin can Get all the data expect themselves ! ) - Done
+- Get User Profile ( All Role Can get There Profile ! ) - Done Approved ! 
+- Crud ( USER's) is All Good - Done
+- UI - Checking and Code Check then Create a UI for Invite manager or to create manager account ! - pending 
+- TABLE User Fix - Ongoing make sure checking pagination !
+  - Pagination is good 
+  - need to emplement the new UI with search bar !  
+- I Observe when have a token even expired always can log in ! - waiting 
+
+-- Create First the Create User UI - 
+    "firstName": "test1User",
+    "lastName": "test1User",
+    "age": 23,
+    "role" :"user",
+    "password": "test1User@user.com",
+    "email": "test1User@user.com",
+    "createdBy" : {
+    "userId" : "6846d4430ea6a9f490892ee0"
+    }

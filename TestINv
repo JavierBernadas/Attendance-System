@@ -1,0 +1,79 @@
+
+
+
+import * as React from 'react';
+import Box from '@mui/material/Box';
+import { DataGrid } from '@mui/x-data-grid';
+// import { useMovieData } from '@mui/x-data-grid-generator';
+
+const columns_name = [
+
+// field: "title"
+// groupable: false
+// headerName: "Title"
+// width: 200
+
+  { field: 'name',groupable: false, headerName: 'Name', width: 200 },
+  { field: 'email',groupable: false, headerName: 'Email', width: 200 },
+  { field: 'role',groupable: false, headerName: 'Role', width: 200 },
+  { field: 'assigned',groupable: false, headerName: 'Assigned', width: 200 },
+];
+
+  const dummyUsers  = [
+
+  {
+    "name": "Jenny Bautista",
+    "email": "jenny.bautista@example.com",
+    "role": "Staff",
+    "assigned": "Patrick Ong"
+  },
+  {
+    "name": "Rafael Gomez",
+    "email": "rafael.gomez@example.com",
+    "role": "User",
+    "assigned": "Jenny Bautista"
+  },
+  {
+    "name": "Lara Mendoza",
+    "email": "lara.mendoza@example.com",
+    "role": "Admin",
+    "assigned": "Maria Dela Cruz"
+  },
+  {
+    "name": "Kevin Torres",
+    "email": "kevin.torres@example.com",
+    "role": "User",
+    "assigned": "Lara Mendoza"
+  },
+  {
+    "name": "Elaine Ramos",
+    "email": "elaine.ramos@example.com",
+    "role": "Staff",
+    "assigned": "Angela Tan"
+  }
+] ;
+console.log(dummyUsers)
+const VISIBLE_FIELDS = ['name', 'email', 'role', 'assigned'];
+
+export default function QuickFilteringGrid() {
+  // const data = useMovieData();
+
+  // Otherwise filter will be applied on fields such as the hidden column id
+  const columns = React.useMemo(
+    () => columns_name.filter((column) => VISIBLE_FIELDS.includes(column.field)),
+    [columns_name],
+  );
+
+  return (
+    <Box sx={{ height: 400, width: 1 }}>
+      <DataGrid
+        rows={dummyUsers}
+        disableColumnFilter
+        disableColumnSelector
+        disableDensitySelector
+        columns={columns}
+        showToolbar
+      />
+    </Box>
+  );
+}

@@ -1,0 +1,72 @@
+nvm use v22.15.1 -  back end - and - front end ! ! ! 
+nvm use v22.15.1 - Remain
+ALT + ~ to use Color Eye Drop ! 
+Working in Monggo DB
+
+first install the application for Local 
+
+1. https://www.mongodb.com/try/download/community
+2. create a data base for your needs.
+3. create a file in vscode name for your backend data query 
+ 1- install express https://expressjs.com/en/starter/installing.html
+ 2- install monggose https://www.npmjs.com/package/mongoose
+
+Mongoose is for Schema 
+Express for Routing 
+
+What is nodemon
+nodemon is a development tool for Node.js that automatically restarts your server when you change any backend files.
+
+--Admin Account 
+    "email" : "admin@admin.com",
+    "password" : "admin@admin.com"
+
+Working in Monggo DB
+
+first install the application for Local 
+
+1. https://www.mongodb.com/try/download/community
+2. create a data base for your needs.
+3. create a file in vscode name for your backend data query 
+ 1- install express https://expressjs.com/en/starter/installing.html
+ 2- install monggose https://www.npmjs.com/package/mongoose
+
+Mongoose is for Schema 
+Express for Routing 
+
+What is nodemon?
+nodemon is a development tool for Node.js that automatically restarts your server when you change any backend files.
+
+// if Naming is "CAPITAL meaning this is a CONSTANT"
+
+// let for changable data ! 
+
+There are 8 basic data types in JavaScript.
+
+Seven primitive data types:
+number 
+bigint 
+string 
+boolean 
+null 
+undefined 
+symbol 
+one non-primitive  - object 
+
+let x = 5;
+
+// PREFIX
+console.log(++x); // Do it first: x becomes 6, then print → 6
+console.log(x);   // x is now 6
+
+// Reset
+x = 5;
+
+// POSTFIX
+console.log(x++); // Use it first: print 5, then x becomes 6
+console.log(x);   // Now x is 6
+
+// Functions ! 
+Declarations 
+Expresstion
+Arrow 
