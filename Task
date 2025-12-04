@@ -33,8 +33,10 @@ By them or who created them only get the data
 - Crud ( USER's) is All Good - Done
 - UI - Checking and Code Check then Create a UI for Invite manager or to create manager account ! - pending 
 - TABLE User Fix - Ongoing make sure checking pagination !
-  - Pagination is good 
-  - need to emplement the new UI with search bar !  
+  - Pagination is good - Done
+  - need to emplement the new UI with search bar  good - Done
+  - pages limit with pagination - Done
+  - Toms = check error handler for invite user - ongoin
 - I Observe when have a token even expired always can log in ! - waiting 
 
 -- Create First the Create User UI - 
