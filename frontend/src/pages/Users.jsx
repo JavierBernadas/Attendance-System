@@ -41,6 +41,8 @@ const columns = [
 
 export default function Users() {
   const [user, setUser] = useState(null);
+  const [countList, setCountList] = useState(0);
+
   const [page, setPage] = React.useState(0);
   const [loading, setLoading] = useState(true);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -53,15 +55,32 @@ export default function Users() {
     setCreateModal(true);
   };
 
-  const UserData = async () => {
+  const UserData = async (pageCount, countLimit) => {
     setLoading(true); // start loading temp to see loading state !
 
     try {
-      const response = await UserAPI.GetUsers(storedToken);
+      const response = await UserAPI.GetUsers(
+        storedToken,
+        pageCount,
+        countLimit
+      );
+      console.log("response :", response);
+      // limit
+      // page
+      // total
+      // totalPages
+      console.log("Limit : ", response.userData.limit);
+      console.log("Page : ", response.userData.page);
+      console.log("Total : ", response.userData.total);
+      console.log("Total Pages : ", response.userData.totalPages);
+
       // ✅ Safely check if the data exists
       const users = response?.userData?.users || [];
       // ✅ Update state
+      // console.log("users : "+ users.userData.user)
       setUser(users);
+
+      setCountList(response.userData.total); // working !
     } catch (error) {
       console.error("Failed to fetch users:", error);
       // Optional: show an error message to the user
@@ -71,20 +90,26 @@ export default function Users() {
   };
 
   const handleChangePage = (event, newPage) => {
+    console.log(" newPage : ", newPage);
     setPage(newPage);
+
+    const apiPage = newPage + 1; // convert from 0 → 1
+    UserData(apiPage, rowsPerPage);
   };
 
+  //row page change !
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
+
+    UserData(1, event.target.value); // reset to page 1
   };
 
   // useEffect for the data to render this page and display !
-
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(true);
-      UserData();
+      UserData(1, 10);
     }, 3000);
 
     return () => clearTimeout(timer);
@@ -105,12 +130,12 @@ export default function Users() {
       .slice(2, 2 + length);
   };
 
-     const NewCreatedUser = async (userValue) => {
-        if (!userValue) {
-          console.error("NewCreatedUser: No user data provided.");
-          notifyError("No user data provided!");
-          return;
-        }
+  const NewCreatedUser = async (userValue) => {
+    if (!userValue) {
+      console.error("NewCreatedUser: No user data provided.");
+      notifyError("No user data provided!");
+      return;
+    }
 
     const tempPassword = generateTempPassword(10);
     console.log("Generated Temporary Password:", tempPassword);
@@ -143,7 +168,6 @@ export default function Users() {
       notifyError(error);
     }
   };
-
   //filter function ! ! !
   const filteredUsers = user.filter((row) => {
     const searchLower = search.toLowerCase();
@@ -205,31 +229,24 @@ export default function Users() {
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredUsers
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => (
-                    <TableRow
-                      hover
-                      role="checkbox"
-                      tabIndex={-1}
-                      key={row.code}
-                    >
-                      {columns.map((column) => {
-                        let value;
-                        if (column.id === "assigned") {
-                          value = row.createdBy?.name || "-";
-                        } else {
-                          value = row[column.id];
-                        }
+                filteredUsers.map((row) => (
+                  <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
+                    {columns.map((column) => {
+                      let value;
+                      if (column.id === "assigned") {
+                        value = row.createdBy?.name || "-";
+                      } else {
+                        value = row[column.id];
+                      }
 
-                        return (
-                          <TableCell key={column.id} align={column.align}>
-                            {value}
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  ))
+                      return (
+                        <TableCell key={column.id} align={column.align}>
+                          {value}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                ))
               )}
             </TableBody>
           </Table>
@@ -237,12 +254,22 @@ export default function Users() {
         <TablePagination
           rowsPerPageOptions={[10, 25, 100]}
           component="div"
+          count={countList} // total how many data in data base !
+          rowsPerPage={rowsPerPage}
+          page={page} // total page !
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+        {/* <TablePagination
+          rowsPerPageOptions={[10, 25, 100]}
+          component="div"
           count={filteredUsers.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
-        />
+        /> */}
+
         {/* modal to create invite user !  */}
         <CreateUser
           open={createModal}

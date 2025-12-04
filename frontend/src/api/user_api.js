@@ -37,10 +37,11 @@ const UserAPI  = {
     }
     }
   },
-  GetUsers : async (token)=>
+  GetUsers : async (token , pages , limit)=>
   {
+    console.log("page :" , pages , "Limit :" , limit)
       try {
-      const response = await fetch(`${API_BASE_URL}/user/users?page=1&limit=100`,{
+      const response = await fetch(`${API_BASE_URL}/user/users?page=${pages}&limit=${limit}`,{
         method : "POST",
         headers : {
           "Content-Type": "application/json",
