@@ -121,6 +121,8 @@ const deletetUser = async (req, res) => {
   }
 };
 //http://localhost:{{port}}/user/users?page=2&limit=5
+// GET /users?page=1&limit=10&search=john
+
 //Done !
 const getAllUsers = async (req, res) => {
   try {
@@ -133,7 +135,8 @@ const getAllUsers = async (req, res) => {
     const skip = (page - 1) * limit;
 
     let filter = {};
-
+    let search = req.query.search;
+    
     if (requestingUserRole === "superadmin") {
       // superadmin can see all except themselves
       filter = { _id: { $ne: currentUserId } };
@@ -144,6 +147,19 @@ const getAllUsers = async (req, res) => {
       // admin/manager can only see users they created/assigned
       filter = { "createdBy.userId": currentUserId };
     }
+    
+    if (search) {
+  filter.$or = [
+    { firstName: { $regex: search, $options: "i" } },
+    // { lastName: { $regex: search, $options: "i" } },
+    { email: { $regex: search, $options: "i" } },
+    { role: { $regex: search, $options: "i" } }
+
+  ];
+}
+
+
+
 
     const totalUsers = await User.countDocuments(filter);
     const users = await User.find(filter)

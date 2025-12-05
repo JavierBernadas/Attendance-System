@@ -1,10 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-// const AuthContext = createContext({
-//   isLoggedIn: false,
-//   userRole: null,
-// });
-
 const AuthContext = createContext({
   isLoggedIn: false,
   userRole: null,

@@ -187,7 +187,7 @@ export default function MiniDrawer() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            Attendance System
+            Attendance Tracker
           </Typography>
         </Toolbar>
       </AppBar>
