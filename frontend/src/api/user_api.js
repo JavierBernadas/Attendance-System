@@ -1,12 +1,13 @@
-const API_BASE_URL  = import.meta.env.VITE_LOCAL_HOST;
+import { Navigate } from "react-router-dom";
+
+const API_BASE_URL = import.meta.env.VITE_LOCAL_HOST;
 
 //check api base ! ! !
 console.log("API_BASE_URL : " + API_BASE_URL);
-const UserAPI  = {
-  
+const UserAPI = {
   Login: async (loginData) => {
     try {
-      const response = await fetch(`${API_BASE_URL }/user/login`, {
+      const response = await fetch(`${API_BASE_URL}/user/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -15,83 +16,84 @@ const UserAPI  = {
         body: JSON.stringify(loginData),
       });
       // make the return json ! ! !
-      const responseBody   = await response.json();
+      const responseBody = await response.json();
       //check first ! ! !
       if (!response.ok) {
-           throw new Error(responseBody.message || "Request failed!"); 
+        throw new Error(responseBody.message || "Request failed!");
       }
       // for Success ! ! !
       return {
-        userData: responseBody  ,
+        userData: responseBody,
       };
-
     } catch (error) {
       console.error("Login error:", error);
-          // Distinguish network error vs API error
-    if (error.name === "TypeError" && error.message === "Failed to fetch") {
-      console.error("⚠️ No internet connection or server unreachable");
-      throw new Error("No connection. Try again.");
-    } else {
-      console.error("Login error:", error.message);
-      throw error;
-    }
+      // Distinguish network error vs API error
+      if (error.name === "TypeError" && error.message === "Failed to fetch") {
+        console.error("⚠️ No internet connection or server unreachable");
+        throw new Error("No connection. Try again.");
+      } else {
+        console.error("Login error:", error.message);
+        throw error;
+      }
     }
   },
-  GetUsers : async (token , pages , limit)=>
-  {
-    console.log("page :" , pages , "Limit :" , limit)
-      try {
-      const response = await fetch(`${API_BASE_URL}/user/users?page=${pages}&limit=${limit}`,{
-        method : "POST",
-        headers : {
-          "Content-Type": "application/json",
+  GetUsers: async (token, pages, limit, searchData) => {
+    console.log("page :", pages, "Limit :", limit);
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/user/users?page=${pages}&limit=${limit}&search=${searchData}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
+          },
         }
-      })
+      );
       // make the return json ! ! !
       const responseBody = await response.json();
-      //check first ! ! !
-      if(!response.ok)
-      {
-       throw new Error(responseBody.message || "Request failed!"); 
+      console.log("responseBody : ", responseBody);
+      //if token expired 
+      if (response.status === 401) {
+          return { error: "Not authenticated" };
       }
-     // for Success ! ! !
+      //check first if ok ! ! !
+      if (!response.ok) {
+        throw new Error(responseBody.message || "Request failed!");
+      }
+      // for Success ! ! !
       return {
-        userData: responseBody  ,
+        userData: responseBody,
       };
-
-      } catch (error) {
-       console.error("Getting User's error:", error);
-      throw error;
-      }
+    } catch (error) {
+      console.error("Getting User's error:", error);
+      throw error.message;
+    }
   },
-  PosstUsers : async (token , userData)=>
-  {
-      try {
-      const response = await fetch(`${API_BASE_URL}/user/signup`,{
-        method : "POST",
-        headers : {
+  PosstUsers: async (token, userData) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/user/signup`, {
+        method: "POST",
+        headers: {
           "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(userData),
-      })
+      });
       // make the return json ! ! !
       const responseBody = await response.json();
       //check first ! ! !
-      if(!response.ok)
-      {
-       throw new Error(responseBody.message || "Request failed!"); 
+      if (!response.ok) {
+        throw new Error(responseBody.message || "Request failed!");
       }
-     // for Success ! ! !
+      // for Success ! ! !
       return {
-        userData: responseBody  ,
+        userData: responseBody,
       };
-
-      } catch (error) {
-       console.error("Post User's error:", error);
+    } catch (error) {
+      console.error("Post User's error:", error);
       throw error;
-      }
-  }
-}
-export default UserAPI ;
+    }
+  },
+};
+export default UserAPI;

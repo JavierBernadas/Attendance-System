@@ -4,7 +4,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import { useNavigate } from "react-router-dom";
-
+import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 const style = {
   position: "absolute",
   top: "50%",
@@ -15,6 +15,7 @@ const style = {
   boxShadow: 24,
   p: 4,
   borderRadius: "10px",
+  outline: "none",
 };
 export default function ErrorNotif({ open, clickHandleClose }) {
   const navigate = useNavigate();
@@ -26,21 +27,34 @@ export default function ErrorNotif({ open, clickHandleClose }) {
 
   return (
     <div>
-      {/* <Button onClick={clickHandleOpen}>Open modal</Button>  */}
       <Modal
         open={open}
-        onClose={clickHandleClose}
+        // onClose={clickHandleClose} remove ang click side !
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
+          <Typography
+            id="modal-modal-title"
+            variant="h6"
+            component="h2"
+            sx={{ display: "flex", alignItems: "center" }}
+          >
+            <ReportProblemIcon
+              sx={{ fontSize: 32, color: "red", mr: 2 }} // red icon + margin-right
+            />
             Your session has expired!
           </Typography>
+
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             Please log in again to continue using the app.
           </Typography>
-          <Button onClick={handleLogin}>Login</Button>
+
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
+            <Button variant="contained" onClick={handleLogin}>
+              Login
+            </Button>
+          </Box>
         </Box>
       </Modal>
     </div>

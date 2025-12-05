@@ -12,6 +12,7 @@ import UserAPI from "../../src/api/user_api";
 import Buttons from "../components/Button/Buttons";
 import CreateUser from "../components/Modal/CreateUser";
 import TextField from "@mui/material/TextField";
+import ErrorNotif from "../components/Modal/ErrorNotif";
 
 import {
   notifySuccess,
@@ -29,58 +30,55 @@ const columns = [
     id: "role",
     label: "Role",
     minWidth: 170,
-    align: "right",
+    align: "left",
   },
-  {
-    id: "assigned",
-    label: "Assigned",
-    minWidth: 170,
-    align: "right",
-  },
+  // {
+  //   id: "assigned",
+  //   label: "Assigned",
+  //   minWidth: 170,
+  //   align: "right",
+  // },
 ];
 
 export default function Users() {
   const [user, setUser] = useState(null);
   const [countList, setCountList] = useState(0);
-
   const [page, setPage] = React.useState(0);
   const [loading, setLoading] = useState(true);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const storedToken = localStorage.getItem("token");
   const [createModal, setCreateModal] = useState(false);
   const [search, setSearch] = React.useState("");
-
+  const [open, setOpen] = React.useState(false);
   // code for getting user's api !
   const toggleCreateModal = () => {
     setCreateModal(true);
   };
-
-  const UserData = async (pageCount, countLimit) => {
+  // best to name this is to fetchUsers / fetchUserData !
+  const UserData = async (pageCount, countLimit, searchData) => {
     setLoading(true); // start loading temp to see loading state !
 
     try {
       const response = await UserAPI.GetUsers(
         storedToken,
         pageCount,
-        countLimit
+        countLimit,
+        searchData
       );
       console.log("response :", response);
-      // limit
-      // page
-      // total
-      // totalPages
-      console.log("Limit : ", response.userData.limit);
-      console.log("Page : ", response.userData.page);
-      console.log("Total : ", response.userData.total);
-      console.log("Total Pages : ", response.userData.totalPages);
+      // check if token expired !
+      if (response?.error === "Not authenticated") {
+        console.log("Token expired -> redirecting...Show Modal !");
+        setOpen(true);
+        // return;
+      }
 
       // ✅ Safely check if the data exists
       const users = response?.userData?.users || [];
       // ✅ Update state
-      // console.log("users : "+ users.userData.user)
       setUser(users);
+      setCountList(response?.userData?.total || 0); // 0 if no data !
 
-      setCountList(response.userData.total); // working !
     } catch (error) {
       console.error("Failed to fetch users:", error);
       // Optional: show an error message to the user
@@ -93,27 +91,30 @@ export default function Users() {
     console.log(" newPage : ", newPage);
     setPage(newPage);
 
+    //just pass a emty search to navigate to another page without a  search !
     const apiPage = newPage + 1; // convert from 0 → 1
-    UserData(apiPage, rowsPerPage);
+    UserData(apiPage, rowsPerPage, "");
   };
 
   //row page change !
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
-
-    UserData(1, event.target.value); // reset to page 1
+    //just pass a emty search to navigate to another page without a  search !
+    UserData(1, event.target.value, ""); // reset to page 1
   };
 
   // useEffect for the data to render this page and display !
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const delayDebounce = setTimeout(() => {
       setLoading(true);
-      UserData(1, 10);
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, []);
+      UserData(1, 10, search);
+      // setRowsPerPage(10);
+      // add this code to reset i ecnounter bug for this  ! working now !
+      setPage(0);
+    }, 500);
+    return () => clearTimeout(delayDebounce);
+  }, [search]);
 
   if (loading)
     return (
@@ -168,19 +169,19 @@ export default function Users() {
       notifyError(error);
     }
   };
-  //filter function ! ! !
-  const filteredUsers = user.filter((row) => {
-    const searchLower = search.toLowerCase();
-    return (
-      row.firstName?.toLowerCase().includes(searchLower) ||
-      row.lastName?.toLowerCase().includes(searchLower) ||
-      row.email?.toLowerCase().includes(searchLower)
-      // row.role?.toLowerCase().includes(searchLower) || remove lang ! !
-      // row.createdBy?.name?.toLowerCase().includes(searchLower) remove lang ! !
-    );
-  });
 
-  // console.log("filteredUsers : " , filteredUsers) Check what data  ! ! !
+  //filter function ! ! ! this function is good when data is already fetch and use that data to filter ! but the best approach is to search inside the data base !
+
+  // const filteredUsers = user.filter((row) => {
+  //   const searchLower = search.toLowerCase();
+  //   return (
+  //     row.firstName?.toLowerCase().includes(searchLower) ||
+  //     row.lastName?.toLowerCase().includes(searchLower) ||
+  //     row.email?.toLowerCase().includes(searchLower)
+  //     // row.role?.toLowerCase().includes(searchLower) || remove lang ! !
+  //     // row.createdBy?.name?.toLowerCase().includes(searchLower) remove lang ! !
+  //   );
+  // });
 
   return (
     <div className=" ">
@@ -222,14 +223,14 @@ export default function Users() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredUsers.length === 0 ? (
+              {user.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={columns.length} align="center">
                     No results found.
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredUsers.map((row) => (
+                user.map((row) => (
                   <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
                     {columns.map((column) => {
                       let value;
@@ -260,16 +261,6 @@ export default function Users() {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
-        {/* <TablePagination
-          rowsPerPageOptions={[10, 25, 100]}
-          component="div"
-          count={filteredUsers.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        /> */}
-
         {/* modal to create invite user !  */}
         <CreateUser
           open={createModal}
@@ -277,6 +268,11 @@ export default function Users() {
           newUserData={NewCreatedUser}
         />
       </Paper>
+      <ErrorNotif
+        open={open}
+        clickHandleOpen={() => setOpen(true)}
+        clickHandleClose={() => setOpen(false)}
+      />
       <ToastContainer />
     </div>
   );
