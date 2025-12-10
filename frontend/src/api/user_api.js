@@ -38,7 +38,7 @@ const UserAPI = {
     }
   },
   GetUsers: async (token, pages, limit, searchData) => {
-    console.log("page :", pages, "Limit :", limit);
+    console.log("From API = page :", pages, "Limit :", limit);
     try {
       const response = await fetch(
         `${API_BASE_URL}/user/users?page=${pages}&limit=${limit}&search=${searchData}`,
@@ -53,9 +53,9 @@ const UserAPI = {
       // make the return json ! ! !
       const responseBody = await response.json();
       console.log("responseBody : ", responseBody);
-      //if token expired 
+      //if token expired
       if (response.status === 401) {
-          return { error: "Not authenticated" };
+        return { error: "Not authenticated" };
       }
       //check first if ok ! ! !
       if (!response.ok) {
@@ -93,6 +93,39 @@ const UserAPI = {
     } catch (error) {
       console.error("Post User's error:", error);
       throw error;
+    }
+  },
+  DeleteUser: async (token , user_id) => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/user/deleteUser/${user_id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const responseBody = await response.json();
+
+         //if token expired
+      if (response.status === 401) {
+        return { error: "Not authenticated" };
+      }
+      //check first if ok ! ! !
+      if (!response.ok) {
+        throw new Error(responseBody.message || "Delete failed!");
+      }
+      // for Success ! ! !
+      return {
+        userData: responseBody,
+      };
+
+    } catch (error) {
+       console.error("Delete User error:", error);
+      throw error.message;
     }
   },
 };
