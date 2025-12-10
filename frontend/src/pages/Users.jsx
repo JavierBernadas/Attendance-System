@@ -13,7 +13,7 @@ import Buttons from "../components/Button/Buttons";
 import CreateUser from "../components/Modal/CreateUser";
 import TextField from "@mui/material/TextField";
 import ErrorNotif from "../components/Modal/ErrorNotif";
-
+import { Button } from "@mui/material";
 import {
   notifySuccess,
   notifyError,
@@ -32,6 +32,13 @@ const columns = [
     minWidth: 170,
     align: "left",
   },
+  {
+    id: "action",
+    label: "Action",
+    minWidth: 170,
+    align: "center",
+  },
+
   // {
   //   id: "assigned",
   //   label: "Assigned",
@@ -78,7 +85,6 @@ export default function Users() {
       // ✅ Update state
       setUser(users);
       setCountList(response?.userData?.total || 0); // 0 if no data !
-
     } catch (error) {
       console.error("Failed to fetch users:", error);
       // Optional: show an error message to the user
@@ -98,6 +104,7 @@ export default function Users() {
 
   //row page change !
   const handleChangeRowsPerPage = (event) => {
+    console.log("+event.target.value : " + +event.target.value);
     setRowsPerPage(+event.target.value);
     setPage(0);
     //just pass a emty search to navigate to another page without a  search !
@@ -157,15 +164,36 @@ export default function Users() {
       setTimeout(() => {
         notifySuccess("User successfully created!");
       }, 50);
-
+      // need to fix ! ! mali walay handler for error ! 
       try {
-        await UserData();
+        UserData(1, 10, search);
       } catch (refreshError) {
         console.warn("Warning: Failed to refresh user list", refreshError);
       }
       // return API response if needed
     } catch (error) {
       console.error("Error creating user:", error);
+      notifyError(error);
+    }
+  };
+
+  const handleDelete = async (user_id) => {
+    try {
+      const response = await UserAPI.DeleteUser(storedToken, user_id);
+      // check if token expired !
+      if (response?.error === "Not authenticated") {
+        console.log("Token expired -> redirecting...Show Modal !");
+        setOpen(true);
+      }
+
+      notifySuccess(response.userData.message);
+      // Wait a bit so toast is visible before re-render
+      setTimeout(() => {
+        UserData(1, rowsPerPage, "");
+      }, 200);
+      console.log(response);
+    } catch (error) {
+      console.error("Error Delete user:", error);
       notifyError(error);
     }
   };
@@ -234,7 +262,25 @@ export default function Users() {
                   <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
                     {columns.map((column) => {
                       let value;
+
+                      // Handle delete button column
+                      if (column.id === "action") {
+                        return (
+                          <TableCell key={column.id} align="center">
+                            <Button
+                              variant="contained"
+                              color="error"
+                              size="small"
+                              onClick={() => handleDelete(row._id)}
+                            >
+                              Delete
+                            </Button>
+                          </TableCell>
+                        );
+                      }
+
                       if (column.id === "assigned") {
+                        // commend lang sa ang assinged !
                         value = row.createdBy?.name || "-";
                       } else {
                         value = row[column.id];
