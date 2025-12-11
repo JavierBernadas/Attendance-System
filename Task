@@ -37,11 +37,12 @@ By them or who created them only get the data
   - need to emplement the new UI with search bar  good - Done
   - pages limit with pagination - Done
 - I Observe when have a token even expired always can log in ! - waiting  - Done
-  - Create Delete Button for User - ongoing
+    - Create Delete Button for User - ongoing
     - modal to confirm delete user
     - handler error 
     - delete then fetch new data 
-    - fix add user fetch have and wiered code ! 
+    - fix add user fetch have and wiered code ! - Done
+    - add check response ! - continue 
   - Toms = check error handler for invite user - ongoin
 
 -- Create First the Create User UI - 

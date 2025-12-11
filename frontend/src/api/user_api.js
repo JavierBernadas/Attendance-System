@@ -17,6 +17,8 @@ const UserAPI = {
       });
       // make the return json ! ! !
       const responseBody = await response.json();
+    
+
       //check first ! ! !
       if (!response.ok) {
         throw new Error(responseBody.message || "Request failed!");
@@ -82,6 +84,10 @@ const UserAPI = {
       });
       // make the return json ! ! !
       const responseBody = await response.json();
+        //if token expired
+      if (response.status === 401) {
+        return { error: "Not authenticated" };
+      }
       //check first ! ! !
       if (!response.ok) {
         throw new Error(responseBody.message || "Request failed!");
