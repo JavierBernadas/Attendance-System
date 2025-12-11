@@ -158,22 +158,43 @@ export default function Users() {
     };
     console.log("Prepared Payload to API:", payload);
     try {
+
       // Call API to create user
       const response = await UserAPI.PosstUsers(storedToken, payload);
+        console.log("response : " , response)
+      // 1️⃣ Handle token expired
+    if (response?.error === "Not authenticated") {
+      setOpen(true); // show session expired modal
+      return;
+    }
+
+    // 2️⃣ Handle backend validation errors
+    if (!response?.success) {
+      notifyError(response?.message || "Failed to create user!");
+      return;
+    }
+
       // Show success toast **before refreshing the list**
-      setTimeout(() => {
-        notifySuccess("User successfully created!");
-      }, 50);
+      // setTimeout(() => {
+      //   notifySuccess("User successfully created!");
+      // }, 50);
+
+      // 3️⃣ Show success toast FIRST before updating state
+    notifySuccess(response?.message || "User successfully created!");
+
+    // 4️⃣ Refresh table AFTER toast
+    await UserData(1, rowsPerPage, "");
+
+
       // need to fix ! ! mali walay handler for error ! 
-      try {
-        UserData(1, 10, search);
-      } catch (refreshError) {
-        console.warn("Warning: Failed to refresh user list", refreshError);
-      }
+       UserData(page + 1, rowsPerPage, ""); 
+    
       // return API response if needed
     } catch (error) {
+
       console.error("Error creating user:", error);
       notifyError(error);
+
     }
   };
 
