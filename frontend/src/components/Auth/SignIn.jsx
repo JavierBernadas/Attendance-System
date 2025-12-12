@@ -212,36 +212,28 @@ const SignIn = () => {
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
-  const onSubmit = async (userInputs, event) => {
+  const onSubmit = async (user_inputs, event) => {
     event.preventDefault(); // prevent refresh form !
     setIsLoading(true);
 
     try {
-      
-      console.log(`User Inputs   :  ${userInputs}`);
-      const response = await UserAPI.Login(userInputs);
-
-      const userRole = response.userData.user.role;
-      const userFirstName = response.userData.user.firstName;
-      const userLastName = response.userData.user.lastName;
+      console.log("User Inputs   :  ", user_inputs);
+      const response = await UserAPI.Login(user_inputs);
+      console.log("response :  ", response);
+      const userRole = response.data.user.role;
+      const userFirstName = response.data.user.firstName;
+      const userLastName = response.data.user.lastName;
       const userFullName = `${userFirstName} ${userLastName}`;
 
-      const token = response.userData.token;
+      const token = response.data.token;
+      //for Loading state style ! 
+      await new Promise((resolve) => setTimeout(resolve, 5000));
 
-      await new Promise(resolve => setTimeout(resolve, 5000));
-      // for storing data ! 
       login(token, userRole, userFullName);
-        navigate("/main");
-      //set lang to the char ! ! ! timeout !
-      // setTimeout(() => {
-      //   login(token, userRole, userFullName);
-      //   navigate("/main");
-      // }, 5000);
+      navigate("/main");
     } catch (error) {
-      console.log(error.message);
       notifyError(error.message || "Login failed");
-    }
-    finally{
+    } finally {
       setIsLoading(false);
     }
   };

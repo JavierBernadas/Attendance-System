@@ -42,8 +42,11 @@ By them or who created them only get the data
     - handler error 
     - delete then fetch new data 
     - fix add user fetch have and wiered code ! - Done
-    - add check response ! - continue 
-  - Toms = check error handler for invite user - ongoin
+    - add check response ! - continue
+    - handler for delete is remove the toast put in the field error 
+    - Toms = check error handler for invite user - ongoin
+    - new format for user_api CreateUser
+
 
 -- Create First the Create User UI - 
     "firstName": "test1User",
