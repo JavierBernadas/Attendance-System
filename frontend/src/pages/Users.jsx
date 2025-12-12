@@ -57,48 +57,14 @@ export default function Users() {
   const [createModal, setCreateModal] = useState(false);
   const [search, setSearch] = React.useState("");
   const [open, setOpen] = React.useState(false);
-  // code for getting user's api !
-  const toggleCreateModal = () => {
-    setCreateModal(true);
-  };
-  // best to name this is to fetchUsers / fetchUserData !
-  const UserData = async (pageCount, countLimit, searchData) => {
-    setLoading(true); // start loading temp to see loading state !
 
-    try {
-      const response = await UserAPI.GetUsers(
-        storedToken,
-        pageCount,
-        countLimit,
-        searchData
-      );
-      console.log("response :", response);
-      // check if token expired !
-      if (response?.error === "Not authenticated") {
-        console.log("Token expired -> redirecting...Show Modal !");
-        setOpen(true);
-        // return;
-      }
 
-      // ✅ Safely check if the data exists
-      const users = response?.userData?.users || [];
-      // ✅ Update state
-      setUser(users);
-      setCountList(response?.userData?.total || 0); // 0 if no data !
-    } catch (error) {
-      console.error("Failed to fetch users:", error);
-      // Optional: show an error message to the user
-    } finally {
-      setLoading(false); // always stop loading
-    }
-  };
-
-  const handleChangePage = (event, newPage) => {
-    console.log(" newPage : ", newPage);
-    setPage(newPage);
+  const handleChangePage = (event, new_page) => {
+    console.log(" newPage : ", new_page);
+    setPage(new_page);
 
     //just pass a emty search to navigate to another page without a  search !
-    const apiPage = newPage + 1; // convert from 0 → 1
+    const apiPage = new_page + 1; // convert from 0 → 1
     UserData(apiPage, rowsPerPage, "");
   };
 
@@ -111,94 +77,115 @@ export default function Users() {
     UserData(1, event.target.value, ""); // reset to page 1
   };
 
-  // useEffect for the data to render this page and display !
-  useEffect(() => {
-    const delayDebounce = setTimeout(() => {
-      setLoading(true);
-      UserData(1, 10, search);
-      // setRowsPerPage(10);
-      // add this code to reset i ecnounter bug for this  ! working now !
-      setPage(0);
-    }, 500);
-    return () => clearTimeout(delayDebounce);
-  }, [search]);
+  // Modal Form to Create User !
+  const toggleCreateModal = () => {
+    setCreateModal(true);
+  };
 
-  if (loading)
-    return (
-      <div className="flex items-center justify-center h-[200px]">
-        <CircularProgress disableShrink />
-      </div>
-    );
 
-  if (!user) return <p>No user data</p>;
+  // Fetch Users !
+  const UserData = async (page_count, count_limit, search_data) => {
+    setLoading(true); // start loading temp to see loading state !
 
-  const generateTempPassword = (length = 10) => {
+    try {
+
+      const response = await UserAPI.GetUsers(
+        storedToken,
+        page_count,
+        count_limit,
+        search_data
+      );
+
+      console.log("response fetch users :", response);
+      // check if token expired !
+      if (response?.error === "Not authenticated") {
+        console.log("Token expired -> redirecting...Show Modal !");
+        setOpen(true);
+        // return;
+      }
+
+      // ✅ Safely check if the data exists
+      const users = response?.data?.users || [];
+      // ✅ Update state
+      setUser(users);
+      setCountList(response?.data?.total || 0); // 0 if no data !
+
+    } catch (error) {
+
+      console.error("Failed to fetch users:", error);
+      // Optional: show an error message to the user
+    } finally {
+      setLoading(false); // always stop loading
+    }
+  };
+
+
+
+
+ // Generate Tem Password for User !
+  const GenerateTempPassword = (length = 10) => {
     return Math.random()
       .toString(36)
       .slice(2, 2 + length);
   };
 
-  const NewCreatedUser = async (userValue) => {
-    if (!userValue) {
+  // Crete new User ! 
+  const NewCreatedUser = async (user_value) => {
+
+    if (!user_value) {
       console.error("NewCreatedUser: No user data provided.");
       notifyError("No user data provided!");
       return;
     }
 
-    const tempPassword = generateTempPassword(10);
-    console.log("Generated Temporary Password:", tempPassword);
+    const tempPassword = GenerateTempPassword(10);
+    console.log("Generated Temporary Password: ", tempPassword);
 
-    const payload = {
-      firstName: userValue.firstName,
-      lastName: userValue.lastName,
-      age: userValue.age,
-      role: userValue.role,
-      email: userValue.email,
+    const payLoad = {
+      firstName: user_value.firstName,
+      lastName: user_value.lastName,
+      age: user_value.age,
+      role: user_value.role,
+      email: user_value.email,
       password: tempPassword,
     };
-    console.log("Prepared Payload to API:", payload);
+
+    console.log("Prepared Payload to API:", payLoad);
+
     try {
 
       // Call API to create user
-      const response = await UserAPI.PosstUsers(storedToken, payload);
-        console.log("response : " , response)
+      const response = await UserAPI.CreateUser(storedToken, payLoad);
+      console.log("response : ", response);
+
       // 1️⃣ Handle token expired
-    if (response?.error === "Not authenticated") {
-      setOpen(true); // show session expired modal
-      return;
-    }
+      if (response?.error === "Not authenticated") {
+        setOpen(true); // show session expired modal
+        return;
+      }
 
-    // 2️⃣ Handle backend validation errors
-    if (!response?.success) {
-      notifyError(response?.message || "Failed to create user!");
-      return;
-    }
-
-      // Show success toast **before refreshing the list**
-      // setTimeout(() => {
-      //   notifySuccess("User successfully created!");
-      // }, 50);
+      // 2️⃣ Handle backend validation errors
+      if (!response?.success) {
+        notifyError(response?.message || "Failed to create user!");
+        return;
+      }
 
       // 3️⃣ Show success toast FIRST before updating state
-    notifySuccess(response?.message || "User successfully created!");
+      notifySuccess(response?.data?.message || "User successfully created!");
 
-    // 4️⃣ Refresh table AFTER toast
-    await UserData(1, rowsPerPage, "");
+      // 4️⃣ Delay before refresh
+      setTimeout(() => {
+        UserData(page + 1, rowsPerPage, "");
+      }, 5000);
 
-
-      // need to fix ! ! mali walay handler for error ! 
-       UserData(page + 1, rowsPerPage, ""); 
-    
       // return API response if needed
     } catch (error) {
-
       console.error("Error creating user:", error);
       notifyError(error);
-
     }
   };
 
-  const handleDelete = async (user_id) => {
+  const HandleDelete = async (user_id) => {
     try {
       const response = await UserAPI.DeleteUser(storedToken, user_id);
       // check if token expired !
@@ -219,18 +206,29 @@ export default function Users() {
     }
   };
 
-  //filter function ! ! ! this function is good when data is already fetch and use that data to filter ! but the best approach is to search inside the data base !
 
-  // const filteredUsers = user.filter((row) => {
-  //   const searchLower = search.toLowerCase();
-  //   return (
-  //     row.firstName?.toLowerCase().includes(searchLower) ||
-  //     row.lastName?.toLowerCase().includes(searchLower) ||
-  //     row.email?.toLowerCase().includes(searchLower)
-  //     // row.role?.toLowerCase().includes(searchLower) || remove lang ! !
-  //     // row.createdBy?.name?.toLowerCase().includes(searchLower) remove lang ! !
-  //   );
-  // });
+    // useEffect for the data to render this page and display !
+  useEffect(() => {
+    // Debounce = delay calling a function until the user stops typing. search !
+    const delayDebounce = setTimeout(() => {
+      setLoading(true);
+      UserData(1, 10, search);
+      // setRowsPerPage(10);
+      // add this code to reset i ecnounter bug for this  ! working now !
+      setPage(0);
+    }, 500);
+    return () => clearTimeout(delayDebounce);
+  }, [search]);
+
+  if (loading)
+    return (
+      <div className="flex items-center justify-center h-[200px]">
+        <CircularProgress disableShrink />
+      </div>
+    );
+
+  if (!user) return <p>No user data</p>;
+
 
   return (
     <div className=" ">
@@ -292,7 +290,7 @@ export default function Users() {
                               variant="contained"
                               color="error"
                               size="small"
-                              onClick={() => handleDelete(row._id)}
+                              onClick={() => HandleDelete(row._id)}
                             >
                               Delete
                             </Button>
@@ -344,3 +342,17 @@ export default function Users() {
     </div>
   );
 }
+
+
+  //filter function ! ! ! this function is good when data is already fetch and use that data to filter ! but the best approach is to search inside the data base !
+
+  // const filteredUsers = user.filter((row) => {
+  //   const searchLower = search.toLowerCase();
+  //   return (
+  //     row.firstName?.toLowerCase().includes(searchLower) ||
+  //     row.lastName?.toLowerCase().includes(searchLower) ||
+  //     row.email?.toLowerCase().includes(searchLower)
+  //     // row.role?.toLowerCase().includes(searchLower) || remove lang ! !
+  //     // row.createdBy?.name?.toLowerCase().includes(searchLower) remove lang ! !
+  //   );
+  // });

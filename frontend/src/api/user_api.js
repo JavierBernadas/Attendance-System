@@ -1,49 +1,47 @@
-import { Navigate } from "react-router-dom";
-
 const API_BASE_URL = import.meta.env.VITE_LOCAL_HOST;
 
-//check api base ! ! !
+//CHECK API BASE URL ! 
 console.log("API_BASE_URL : " + API_BASE_URL);
+
+// Login User !
 const UserAPI = {
-  Login: async (loginData) => {
+  Login: async (user_data) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/user/login`, {
+      const apiResponse = await fetch(`${API_BASE_URL}/user/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           //  Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(loginData),
+        body: JSON.stringify(user_data),
       });
       // make the return json ! ! !
-      const responseBody = await response.json();
-    
+      const result = await apiResponse.json();
 
       //check first ! ! !
-      if (!response.ok) {
-        throw new Error(responseBody.message || "Request failed!");
+      if (!apiResponse.ok) {
+        throw new Error(result.message || "Login failed!");
       }
-      // for Success ! ! !
+
+      // 🟢 Success
       return {
-        userData: responseBody,
+        success: true,
+        data: result,
       };
     } catch (error) {
       console.error("Login error:", error);
-      // Distinguish network error vs API error
-      if (error.name === "TypeError" && error.message === "Failed to fetch") {
-        console.error("⚠️ No internet connection or server unreachable");
-        throw new Error("No connection. Try again.");
-      } else {
-        console.error("Login error:", error.message);
-        throw error;
-      }
+       return {
+        success: false,
+        errorType: "network",
+        message: "Unable to connect to the server.",
+      };
     }
   },
-  GetUsers: async (token, pages, limit, searchData) => {
-    console.log("From API = page :", pages, "Limit :", limit);
+
+  GetUsers: async (token, pages, limit, search_data) => {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/user/users?page=${pages}&limit=${limit}&search=${searchData}`,
+      const apiResponse = await fetch(
+        `${API_BASE_URL}/user/users?page=${pages}&limit=${limit}&search=${search_data}`,
         {
           method: "POST",
           headers: {
@@ -52,58 +50,92 @@ const UserAPI = {
           },
         }
       );
-      // make the return json ! ! !
-      const responseBody = await response.json();
-      console.log("responseBody : ", responseBody);
-      //if token expired
-      if (response.status === 401) {
-        return { error: "Not authenticated" };
+      const result = await apiResponse.json();
+      // 🔐 Token expired
+      if (apiResponse.status === 401) {
+        return {
+          success: false,
+          errorType: "auth",
+          message: "Not authenticated",
+        };
       }
-      //check first if ok ! ! !
-      if (!response.ok) {
-        throw new Error(responseBody.message || "Request failed!");
+
+      // ❌ API returned an error
+      if (!apiResponse.ok) {
+        return {
+          success: false,
+          errorType: "api",
+          message: result.message || "Failed to Get user.",
+        };
       }
-      // for Success ! ! !
+
+      // 🟢 Success
       return {
-        userData: responseBody,
+        success: true,
+        data: result,
       };
     } catch (error) {
       console.error("Getting User's error:", error);
-      throw error.message;
+
+      return {
+        success: false,
+        errorType: "network",
+        message: "Unable to connect to the server.",
+      };
     }
   },
-  PosstUsers: async (token, userData) => {
+  // Create User API - NEW FORMAT
+  CreateUser: async (token, newUserData) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/user/signup`, {
+      const apiResponse = await fetch(`${API_BASE_URL}/user/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(userData),
+        body: JSON.stringify(newUserData),
       });
-      // make the return json ! ! !
-      const responseBody = await response.json();
-        //if token expired
-      if (response.status === 401) {
-        return { error: "Not authenticated" };
+
+      const result = await apiResponse.json();
+
+      // 🔐 Token expired
+      if (apiResponse.status === 401) {
+        return {
+          success: false,
+          errorType: "auth",
+          message: "Not authenticated",
+        };
       }
-      //check first ! ! !
-      if (!response.ok) {
-        throw new Error(responseBody.message || "Request failed!");
+
+      // ❌ API returned an error
+      if (!apiResponse.ok) {
+        return {
+          success: false,
+          errorType: "api",
+          message: result.message || "Failed to create user.",
+        };
       }
-      // for Success ! ! !
+
+      // 🟢 Success
       return {
-        userData: responseBody,
+        success: true,
+        data: result,
       };
     } catch (error) {
-      console.error("Post User's error:", error);
-      throw error;
+      console.error("CreateUser API Error:", error);
+
+      return {
+        success: false,
+        errorType: "network",
+        message: "Unable to connect to the server.",
+      };
     }
   },
-  DeleteUser: async (token , user_id) => {
+
+  // Delete User !
+  DeleteUser: async (token, user_id) => {
     try {
-      const response = await fetch(
+      const apiResponse = await fetch(
         `${API_BASE_URL}/user/deleteUser/${user_id}`,
         {
           method: "DELETE",
@@ -114,24 +146,39 @@ const UserAPI = {
         }
       );
 
-      const responseBody = await response.json();
+      const result = await apiResponse.json();
 
-         //if token expired
-      if (response.status === 401) {
-        return { error: "Not authenticated" };
+      // 🔐 Token expired
+      if (apiResponse.status === 401) {
+        return {
+          success: false,
+          errorType: "auth",
+          message: "Not authenticated",
+        };
       }
-      //check first if ok ! ! !
-      if (!response.ok) {
-        throw new Error(responseBody.message || "Delete failed!");
+
+      // ❌ API returned an error
+      if (!apiResponse.ok) {
+        return {
+          success: false,
+          errorType: "api",
+          message: result.message || "Failed to delete user.",
+        };
       }
-      // for Success ! ! !
+
+      // 🟢 Success
       return {
-        userData: responseBody,
+        success: true,
+        data: result,
       };
-
     } catch (error) {
-       console.error("Delete User error:", error);
-      throw error.message;
+      console.error("Delete User error:", error);
+
+      return {
+        success: false,
+        errorType: "network",
+        message: "Unable to connect to the server.",
+      };
     }
   },
 };
