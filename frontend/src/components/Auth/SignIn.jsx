@@ -200,6 +200,7 @@ import { ToastContainer } from "react-toastify";
 import Button from "@mui/material/Button";
 import { useForm } from "react-hook-form";
 const SignIn = () => {
+  
   const {
     register,
     handleSubmit,
@@ -213,23 +214,28 @@ const SignIn = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async (user_inputs, event) => {
+
     event.preventDefault(); // prevent refresh form !
     setIsLoading(true);
 
     try {
       console.log("User Inputs   :  ", user_inputs);
       const response = await UserAPI.Login(user_inputs);
-      console.log("response :  ", response);
-      const userRole = response.data.user.role;
-      const userFirstName = response.data.user.firstName;
-      const userLastName = response.data.user.lastName;
-      const userFullName = `${userFirstName} ${userLastName}`;
 
+      if (!response?.data?.user) {
+        throw new Error(response?.message || "Invalid credentials");
+      }
+
+      console.log("response.success :  ", response.success);
+
+      const { role, firstName, lastName } = response.data.user;
       const token = response.data.token;
-      //for Loading state style ! 
+      const userFullName = `${firstName} ${lastName}`;
+
+      //for Loading state style !
       await new Promise((resolve) => setTimeout(resolve, 5000));
 
-      login(token, userRole, userFullName);
+      login(token, role, userFullName);
       navigate("/main");
     } catch (error) {
       notifyError(error.message || "Login failed");
