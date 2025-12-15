@@ -53,7 +53,7 @@ export default function Users() {
   const [page, setPage] = React.useState(0);
   const [loading, setLoading] = useState(true);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const storedToken = localStorage.getItem("token");
+  const STORED_TOKEN = localStorage.getItem("token");
   const [createModal, setCreateModal] = useState(false);
   const [search, setSearch] = React.useState("");
   const [open, setOpen] = React.useState(false);
@@ -90,7 +90,7 @@ export default function Users() {
     try {
 
       const response = await UserAPI.GetUsers(
-        storedToken,
+        STORED_TOKEN,
         page_count,
         count_limit,
         search_data
@@ -155,7 +155,7 @@ export default function Users() {
     try {
 
       // Call API to create user
-      const response = await UserAPI.CreateUser(storedToken, payLoad);
+      const response = await UserAPI.CreateUser(STORED_TOKEN, payLoad);
       console.log("response : ", response);
 
       // 1️⃣ Handle token expired
@@ -187,18 +187,27 @@ export default function Users() {
 
   const HandleDelete = async (user_id) => {
     try {
-      const response = await UserAPI.DeleteUser(storedToken, user_id);
+      console.log(user_id)
+      const response = await UserAPI.DeleteUser(STORED_TOKEN, user_id);
+
+      console.log(response , "HAHAHA")
+
+     if (!response?.success) {
+
+        throw new Error(response?.message || "Invalid credentials");
+      }
+
       // check if token expired !
       if (response?.error === "Not authenticated") {
         console.log("Token expired -> redirecting...Show Modal !");
         setOpen(true);
       }
 
-      notifySuccess(response.userData.message);
+      notifySuccess(response?.data?.message);
       // Wait a bit so toast is visible before re-render
       setTimeout(() => {
         UserData(1, rowsPerPage, "");
-      }, 200);
+      }, 5000);
       console.log(response);
     } catch (error) {
       console.error("Error Delete user:", error);

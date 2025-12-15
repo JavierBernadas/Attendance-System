@@ -1,6 +1,6 @@
 const API_BASE_URL = import.meta.env.VITE_LOCAL_HOST;
 
-//CHECK API BASE URL ! 
+//CHECK API BASE URL !
 console.log("API_BASE_URL : " + API_BASE_URL);
 
 // Login User !
@@ -29,11 +29,11 @@ const UserAPI = {
         data: result,
       };
     } catch (error) {
-      console.error("Login error:", error);
-       return {
+      console.error("Login error : ", error);
+      return {
         success: false,
         errorType: "network",
-        message: "Unable to connect to the server.",
+        message: error,
       };
     }
   },
@@ -171,6 +171,7 @@ const UserAPI = {
         success: true,
         data: result,
       };
+      
     } catch (error) {
       console.error("Delete User error:", error);
 
