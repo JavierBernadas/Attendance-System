@@ -6,6 +6,7 @@ import Fade from "@mui/material/Fade";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
+import { useForm } from "react-hook-form";
 
 const style = {
   position: "absolute",
@@ -20,46 +21,26 @@ const style = {
 };
 
 export default function CreateUser({ open, onClose, newUserData }) {
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    age: "",
-    role: "",
-    email: "",
-  });
+  // const [formData, setFormData] = useState({
+  //   firstName: "",
+  //   lastName: "",
+  //   age: "",
+  //   role: "",
+  //   email: "",
+  // });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm();
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessageResponse, setErrorMessageResponse] = useState("");
+  const onSubmit = async (user_inputs, event) => {
+    event.preventDefault(); // prevent refresh form !
+    setIsLoading(true);
   };
-
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  onClose(); 
-  try {
-    // Call parent function to create user
-    await newUserData(formData);
-    // Reset form after successful submit
-    resetForm();
-  } catch (error) {
-    // Reset form even on error
-    resetForm();
-  }
-};
-
-// Utility function to reset form fields
-const resetForm = () => {
-  setFormData({
-    firstName: "",
-    lastName: "",
-    age: "",
-    role: "",
-    email: "",
-  });
-};
 
   return (
     <Modal
@@ -83,16 +64,16 @@ const resetForm = () => {
             component="h2"
             className="mb-4 text-center font-semibold"
           >
-            Create User
+            User's Details
           </Typography>
 
           {/* Form */}
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit(onSubmit)}>
             {/* First Name */}
-            <div className="mb-3">
+            <div className="mb-2">
               <label
-                htmlFor="firstName"
-                className="block mb-1 text-sm font-medium text-gray-900"
+                htmlFor="email"
+                className="block mb-2 text-sm font-medium text-gray-900"
               >
                 First Name
               </label>
@@ -100,20 +81,34 @@ const resetForm = () => {
                 type="text"
                 id="firstName"
                 name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-                placeholder="Enter first name"
-                required
-                className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
-                  focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                autoComplete="firstName"
+                className={`block w-full rounded-lg p-2.5 text-sm shadow-sm bg-gray-50 
+    border ${
+      errors.firstName
+        ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+        : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+    } text-gray-900`}
+                {...register("firstName", {
+                  required: "First Name is required",
+                  onChange: () => setErrorMessageResponse(""),
+                })}
+                aria-invalid={errors.firstName ? "true" : "false"}
+                placeholder="Your First name"
               />
-            </div>
 
+              {errors.firstName && (
+                <div className="mt-2 rounded-md  bg-red-50 p-2">
+                  <p className="text-sm font-medium text-red-700">
+                    {errors.firstName.message}
+                  </p>
+                </div>
+              )}
+            </div>
             {/* Last Name */}
-            <div className="mb-3">
+            <div className="mb-2">
               <label
                 htmlFor="lastName"
-                className="block mb-1 text-sm font-medium text-gray-900"
+                className="block mb-2 text-sm font-medium text-gray-900"
               >
                 Last Name
               </label>
@@ -121,20 +116,34 @@ const resetForm = () => {
                 type="text"
                 id="lastName"
                 name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-                placeholder="Enter last name"
-                required
-                className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
-                  focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                autoComplete="lastName"
+                className={`block w-full rounded-lg p-2.5 text-sm shadow-sm bg-gray-50 
+    border ${
+      errors.lastName
+        ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+        : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+    } text-gray-900`}
+                {...register("lastName", {
+                  required: "Last name  is required",
+                  onChange: () => setErrorMessageResponse(""),
+                })}
+                aria-invalid={errors.lastName ? "true" : "false"}
+                placeholder="Your Last name"
               />
-            </div>
 
+              {errors.lastName && (
+                <div className="mt-2 rounded-md  bg-red-50 p-2">
+                  <p className="text-sm font-medium text-red-700">
+                    {errors.lastName.message}
+                  </p>
+                </div>
+              )}
+            </div>
             {/* Age */}
-            <div className="mb-3">
+            <div className="mb-2">
               <label
                 htmlFor="age"
-                className="block mb-1 text-sm font-medium text-gray-900"
+                className="block mb-2 text-sm font-medium text-gray-900"
               >
                 Age
               </label>
@@ -142,69 +151,85 @@ const resetForm = () => {
                 type="number"
                 id="age"
                 name="age"
-                value={formData.age}
-                onChange={handleChange}
-                placeholder="Enter age"
-                required
-                className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
-                  focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                autoComplete="age"
+                className={`block w-full rounded-lg p-2.5 text-sm shadow-sm bg-gray-50 
+    border ${
+      errors.age
+        ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+        : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+    } text-gray-900`}
+                {...register("age", {
+                  required: "Age name  is required",
+                  onChange: () => setErrorMessageResponse(""),
+                })}
+                aria-invalid={errors.age ? "true" : "false"}
+                placeholder="Your Age"
               />
-            </div>
 
+              {errors.age && (
+                <div className="mt-2 rounded-md  bg-red-50 p-2">
+                  <p className="text-sm font-medium text-red-700">
+                    {errors.age.message}
+                  </p>
+                </div>
+              )}
+            </div>
             {/* Role */}
-            <div className="mb-3">
+            <div className="mb-2">
               <label
                 htmlFor="role"
-                className="block mb-1 text-sm font-medium text-gray-900"
+                className="block mb-2 text-sm font-medium text-gray-900"
               >
                 Role
               </label>
               <select
+                type="text"
                 id="role"
                 name="role"
-                value={formData.role}
-                onChange={handleChange}
-                required
-                className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
-                  focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                autoComplete="role"
+                className={`block w-full rounded-lg p-2.5 text-sm shadow-sm bg-gray-50 
+    border ${
+      errors.role
+        ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+        : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+    } text-gray-900`}
+                {...register("role", {
+                  required: "Role is required",
+                  onChange: () => setErrorMessageResponse(""),
+                })}
+                aria-invalid={errors.role ? "true" : "false"}
+                placeholder="Your Role"
               >
                 <option value="">Select role</option>
                 {/* <option value="user">User</option>
                 <option value="admin">Admin</option> */}
                 <option value="manager">Manager</option>
-
               </select>
+              {errors.role && (
+                <div className="mt-2 rounded-md  bg-red-50 p-2">
+                  <p className="text-sm font-medium text-red-700">
+                    {errors.role.message}
+                  </p>
+                </div>
+              )}
             </div>
 
-            {/* Email */}
-            <div className="mb-3">
-              <label
-                htmlFor="email"
-                className="block mb-1 text-sm font-medium text-gray-900"
-              >
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="name@flowbite.com"
-                required
-                className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
-                  focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-              />
-            </div>
             {/* Action Buttons */}
             <Stack
               spacing={1}
               direction="row"
               sx={{ justifyContent: "flex-end" }}
             >
-              <Button type="submit" variant="contained">
+              <Button
+                type="submit"
+                loading={isLoading}
+                // loadingIndicator="Logging in..."
+                disabled={isLoading}
+                variant="contained"
+              >
                 Create
               </Button>
+
               <Button variant="outlined" onClick={onClose}>
                 Cancel
               </Button>

@@ -195,26 +195,24 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Context/AuthProvider";
 import { useState } from "react";
 import UserAPI from "../../api/user_api";
-import { notifyError } from "../Toastify/notifications";
+import { notifyError } from "../Toastify/notifications"; // remove sa !
 import { ToastContainer } from "react-toastify";
 import Button from "@mui/material/Button";
 import { useForm } from "react-hook-form";
 const SignIn = () => {
-  
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors },
   } = useForm();
-
   //navigate using route ! ! !
   const navigate = useNavigate();
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-
+  const [errorMessageResponse, setErrorMessageResponse] = useState("");
+  console.log(watch("email"));
   const onSubmit = async (user_inputs, event) => {
-
     event.preventDefault(); // prevent refresh form !
     setIsLoading(true);
 
@@ -229,6 +227,7 @@ const SignIn = () => {
       console.log("response.success :  ", response.success);
 
       const { role, firstName, lastName } = response.data.user;
+
       const token = response.data.token;
       const userFullName = `${firstName} ${lastName}`;
 
@@ -238,7 +237,9 @@ const SignIn = () => {
       login(token, role, userFullName);
       navigate("/main");
     } catch (error) {
-      notifyError(error.message || "Login failed");
+      // remove toast so OA HAHA !
+      // notifyError(error.message || "Login failed");
+      setErrorMessageResponse(error.message || "Login failed");
     } finally {
       setIsLoading(false);
     }
@@ -255,7 +256,7 @@ const SignIn = () => {
         </h2>
         <h6>superadmin@superadmin.com</h6>
         <h6>admin@admin.com</h6>
-        <div className="mb-5">
+        <div className="mb-2">
           <label
             htmlFor="email"
             className="block mb-2 text-sm font-medium text-gray-900"
@@ -267,17 +268,30 @@ const SignIn = () => {
             id="email"
             name="email"
             autoComplete="username"
-            className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-            {...register("email", { required: "Email Address is required" })}
+            className={`block w-full rounded-lg p-2.5 text-sm shadow-sm bg-gray-50 
+    border ${
+      errors.email
+        ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+        : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+    } text-gray-900`}
+            {...register("email", {
+              required: "Email Address is required",
+              onChange: () => setErrorMessageResponse(""),
+            })}
             aria-invalid={errors.email ? "true" : "false"}
-            placeholder="name@flowbite.com"
+            placeholder="sample@gmail.com"
           />
+
           {errors.email && (
-            <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+            <div className="mt-3 rounded-md border border-red-300 bg-red-50 px-3 py-2">
+              <p className="text-sm font-medium text-red-700">
+                {errors.email.message}
+              </p>
+            </div>
           )}
         </div>
 
-        <div className="mb-2">
+        <div className="">
           <label
             htmlFor="password"
             className="block mb-2 text-sm font-medium text-gray-900"
@@ -289,14 +303,35 @@ const SignIn = () => {
             id="password"
             name="password"
             autoComplete="current-password"
-            className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-            {...register("password", { required: "Password is required" })}
             aria-invalid={errors.password ? "true" : "false"}
+            placeholder="Password"
+
+            className={`block w-full rounded-lg p-2.5 text-sm shadow-sm bg-gray-50 
+    border ${
+      errors.password
+        ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+        : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+    } text-gray-900`}
+            {...register("password", {
+              required: "Password is required",
+              onChange: () => setErrorMessageResponse(""),
+            })}
           />
+
           {errors.password && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.password.message}
-            </p>
+            <div className="mt-3 rounded-md border border-red-300 bg-red-50 px-3 py-2">
+              <p className="text-sm font-medium text-red-700">
+                {errors.password.message}
+              </p>
+            </div>
+          )}
+          {/* added error handler wrongcdntial */}
+          {errorMessageResponse && (
+            <div className="mt-3 rounded-md border border-red-300 bg-red-50 px-3 py-2">
+              <p className="text-sm font-medium text-red-700">
+                {errorMessageResponse}
+              </p>
+            </div>
           )}
         </div>
 
