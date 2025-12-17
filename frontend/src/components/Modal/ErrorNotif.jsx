@@ -17,7 +17,7 @@ const style = {
   borderRadius: "10px",
   outline: "none",
 };
-export default function ErrorNotif({ open, clickHandleClose }) {
+export default function ErrorNotif({ open }) {
   const navigate = useNavigate();
   const handleLogin = () => {
     console.log("Back to Login Token Expired ! ");
@@ -29,7 +29,6 @@ export default function ErrorNotif({ open, clickHandleClose }) {
     <div>
       <Modal
         open={open}
-        // onClose={clickHandleClose} remove ang click side !
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >

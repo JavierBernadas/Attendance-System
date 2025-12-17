@@ -1,9 +1,11 @@
 const API_BASE_URL = import.meta.env.VITE_LOCAL_HOST;
+// KULANG UPDATE PASSWORD / Chhange PASSWORD ! 
+
 
 //CHECK API BASE URL !
 console.log("API_BASE_URL : " + API_BASE_URL);
 
-// Login User !
+  // Login User !
 const UserAPI = {
   Login: async (user_data) => {
     try {
@@ -37,7 +39,7 @@ const UserAPI = {
       };
     }
   },
-
+  //  Get Users !
   GetUsers: async (token, pages, limit, search_data) => {
     try {
       const apiResponse = await fetch(
@@ -50,6 +52,7 @@ const UserAPI = {
           },
         }
       );
+
       const result = await apiResponse.json();
       // 🔐 Token expired
       if (apiResponse.status === 401) {
@@ -84,8 +87,9 @@ const UserAPI = {
       };
     }
   },
+
   // Create User API - NEW FORMAT
-  CreateUser: async (token, newUserData) => {
+  CreateUser: async (token, new_user_data) => {
     try {
       const apiResponse = await fetch(`${API_BASE_URL}/user/signup`, {
         method: "POST",
@@ -93,7 +97,7 @@ const UserAPI = {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(newUserData),
+        body: JSON.stringify(new_user_data),
       });
 
       const result = await apiResponse.json();
@@ -171,7 +175,6 @@ const UserAPI = {
         success: true,
         data: result,
       };
-      
     } catch (error) {
       console.error("Delete User error:", error);
 
@@ -183,4 +186,5 @@ const UserAPI = {
     }
   },
 };
+
 export default UserAPI;

@@ -58,7 +58,6 @@ export default function Users() {
   const [search, setSearch] = React.useState("");
   const [open, setOpen] = React.useState(false);
 
-
   const handleChangePage = (event, new_page) => {
     console.log(" newPage : ", new_page);
     setPage(new_page);
@@ -82,13 +81,11 @@ export default function Users() {
     setCreateModal(true);
   };
 
-
   // Fetch Users !
   const UserData = async (page_count, count_limit, search_data) => {
     setLoading(true); // start loading temp to see loading state !
 
     try {
-
       const response = await UserAPI.GetUsers(
         STORED_TOKEN,
         page_count,
@@ -97,8 +94,9 @@ export default function Users() {
       );
 
       console.log("response fetch users :", response);
+
       // check if token expired !
-      if (response?.error === "Not authenticated") {
+      if (response?.message === "Not authenticated") {
         console.log("Token expired -> redirecting...Show Modal !");
         setOpen(true);
         // return;
@@ -109,9 +107,7 @@ export default function Users() {
       // ✅ Update state
       setUser(users);
       setCountList(response?.data?.total || 0); // 0 if no data !
-
     } catch (error) {
-
       console.error("Failed to fetch users:", error);
       // Optional: show an error message to the user
     } finally {
@@ -119,17 +115,14 @@ export default function Users() {
     }
   };
 
-
-
-
- // Generate Tem Password for User !
+  // Generate Tem Password for User !
   const GenerateTempPassword = (length = 10) => {
     return Math.random()
       .toString(36)
       .slice(2, 2 + length);
   };
 
-  // Crete new User ! 
+  // Crete new User !
   const NewCreatedUser = async (user_value) => {
 
     if (!user_value) {
@@ -153,7 +146,6 @@ export default function Users() {
     console.log("Prepared Payload to API:", payLoad);
 
     try {
-
       // Call API to create user
       const response = await UserAPI.CreateUser(STORED_TOKEN, payLoad);
       console.log("response : ", response);
@@ -187,13 +179,12 @@ export default function Users() {
 
   const HandleDelete = async (user_id) => {
     try {
-      console.log(user_id)
+      console.log(user_id);
       const response = await UserAPI.DeleteUser(STORED_TOKEN, user_id);
 
-      console.log(response , "HAHAHA")
+      console.log(response, "HAHAHA");
 
-     if (!response?.success) {
-
+      if (!response?.success) {
         throw new Error(response?.message || "Invalid credentials");
       }
 
@@ -204,10 +195,12 @@ export default function Users() {
       }
 
       notifySuccess(response?.data?.message);
+
       // Wait a bit so toast is visible before re-render
       setTimeout(() => {
         UserData(1, rowsPerPage, "");
       }, 5000);
+
       console.log(response);
     } catch (error) {
       console.error("Error Delete user:", error);
@@ -215,8 +208,7 @@ export default function Users() {
     }
   };
 
-
-    // useEffect for the data to render this page and display !
+  // useEffect for the data to render this page and display !
   useEffect(() => {
     // Debounce = delay calling a function until the user stops typing. search !
     const delayDebounce = setTimeout(() => {
@@ -237,7 +229,6 @@ export default function Users() {
     );
 
   if (!user) return <p>No user data</p>;
-
 
   return (
     <div className=" ">
@@ -335,33 +326,35 @@ export default function Users() {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
+      
+      </Paper>
         {/* modal to create invite user !  */}
         <CreateUser
           open={createModal}
           onClose={() => setCreateModal(false)}
           newUserData={NewCreatedUser}
         />
-      </Paper>
+
       <ErrorNotif
         open={open}
         clickHandleOpen={() => setOpen(true)}
         clickHandleClose={() => setOpen(false)}
       />
+
       <ToastContainer />
     </div>
   );
 }
 
+//filter function ! ! ! this function is good when data is already fetch and use that data to filter ! but the best approach is to search inside the data base !
 
-  //filter function ! ! ! this function is good when data is already fetch and use that data to filter ! but the best approach is to search inside the data base !
-
-  // const filteredUsers = user.filter((row) => {
-  //   const searchLower = search.toLowerCase();
-  //   return (
-  //     row.firstName?.toLowerCase().includes(searchLower) ||
-  //     row.lastName?.toLowerCase().includes(searchLower) ||
-  //     row.email?.toLowerCase().includes(searchLower)
-  //     // row.role?.toLowerCase().includes(searchLower) || remove lang ! !
-  //     // row.createdBy?.name?.toLowerCase().includes(searchLower) remove lang ! !
-  //   );
-  // });
+// const filteredUsers = user.filter((row) => {
+//   const searchLower = search.toLowerCase();
+//   return (
+//     row.firstName?.toLowerCase().includes(searchLower) ||
+//     row.lastName?.toLowerCase().includes(searchLower) ||
+//     row.email?.toLowerCase().includes(searchLower)
+//     // row.role?.toLowerCase().includes(searchLower) || remove lang ! !
+//     // row.createdBy?.name?.toLowerCase().includes(searchLower) remove lang ! !
+//   );
+// });
