@@ -57,6 +57,7 @@ export default function Users() {
   const [createModal, setCreateModal] = useState(false);
   const [search, setSearch] = React.useState("");
   const [open, setOpen] = React.useState(false);
+  const [errorMessageResponse, setErrorMessageResponse] = useState("");
 
   const handleChangePage = (event, new_page) => {
     console.log(" newPage : ", new_page);
@@ -121,33 +122,37 @@ export default function Users() {
       .toString(36)
       .slice(2, 2 + length);
   };
-
+  console.log("errorMessageResponse : " , errorMessageResponse)
   // Crete new User !
-  const NewCreatedUser = async (user_value) => {
+  const NewCreatedUser = async (user_inputs) => {
+    console.log("user_inputs : " , user_inputs)
+    // wait setErrorMessageResponse("TEST LANG ")
 
-    if (!user_value) {
-      console.error("NewCreatedUser: No user data provided.");
-      notifyError("No user data provided!");
-      return;
-    }
 
-    const tempPassword = GenerateTempPassword(10);
-    console.log("Generated Temporary Password: ", tempPassword);
+    // this condition is need to removed handler error is already in the form ! 
+    // if (!user_inputs) {
+    //   console.error("NewCreatedUser: No user data provided.");
+    //   notifyError("No user data provided!");
+    //   return;
+    // }
 
-    const payLoad = {
-      firstName: user_value.firstName,
-      lastName: user_value.lastName,
-      age: user_value.age,
-      role: user_value.role,
-      email: user_value.email,
-      password: tempPassword,
-    };
+    // const tempPassword = GenerateTempPassword(10);
+    // console.log("Generated Temporary Password: ", tempPassword);
 
-    console.log("Prepared Payload to API:", payLoad);
+    // const payLoad = {
+    //   firstName: user_value.firstName,
+    //   lastName: user_value.lastName,
+    //   age: user_value.age,
+    //   role: user_value.role,
+    //   email: user_value.email,
+    //   password: tempPassword,
+    // };
+
+    // console.log("Prepared Payload to API:", payLoad);
 
     try {
       // Call API to create user
-      const response = await UserAPI.CreateUser(STORED_TOKEN, payLoad);
+      const response = await UserAPI.CreateUser(STORED_TOKEN, user_inputs);
       console.log("response : ", response);
 
       // 1️⃣ Handle token expired
@@ -169,12 +174,16 @@ export default function Users() {
       setTimeout(() => {
         UserData(page + 1, rowsPerPage, "");
       }, 5000);
+    setCreateModal(false);
+
 
       // return API response if needed
     } catch (error) {
       console.error("Error creating user:", error);
-      notifyError(error);
+      setErrorMessageResponse(error);
+      // notifyError(error);
     }
+
   };
 
   const HandleDelete = async (user_id) => {
@@ -333,6 +342,7 @@ export default function Users() {
           open={createModal}
           onClose={() => setCreateModal(false)}
           newUserData={NewCreatedUser}
+          apiErrorMEssage={errorMessageResponse}
         />
 
       <ErrorNotif
