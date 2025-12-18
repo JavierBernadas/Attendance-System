@@ -20,7 +20,7 @@ const style = {
   borderRadius: "10px",
 };
 
-export default function CreateUser({ open, onClose, newUserData }) {
+export default function CreateUser({ open, onClose, newUserData , apiErrorMEssage }) {
   // const [formData, setFormData] = useState({
   //   firstName: "",
   //   lastName: "",
@@ -37,11 +37,27 @@ export default function CreateUser({ open, onClose, newUserData }) {
   } = useForm();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessageResponse, setErrorMessageResponse] = useState("");
-  const onSubmit = async (user_inputs, event) => {
-    event.preventDefault(); // prevent refresh form !
-    setIsLoading(true);
+
+  // Generate Tem Password for User !
+  const GenerateTempPassword = (length = 10) => {
+    return Math.random()
+      .toString(36)
+      .slice(2, 2 + length);
   };
 
+  const onSubmit = async (user_inputs, event) => {
+    event.preventDefault(); // prevent refresh form !
+    const tempPassword = GenerateTempPassword(10);
+const USER_DATA = {
+  ...user_inputs,
+  password: tempPassword,
+};
+setErrorMessageResponse(apiErrorMEssage)
+    console.log("USER_DATA : " ,USER_DATA )
+    newUserData(USER_DATA)
+    // setIsLoading(true);
+  };
+console.log("errorMessageResponse Create use : " , errorMessageResponse)
   return (
     <Modal
       aria-labelledby="transition-modal-title"
@@ -159,7 +175,7 @@ export default function CreateUser({ open, onClose, newUserData }) {
         : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
     } text-gray-900`}
                 {...register("age", {
-                  required: "Age name  is required",
+                  required: "Age is required",
                   onChange: () => setErrorMessageResponse(""),
                 })}
                 aria-invalid={errors.age ? "true" : "false"}
@@ -212,6 +228,50 @@ export default function CreateUser({ open, onClose, newUserData }) {
                   </p>
                 </div>
               )}
+            </div>
+
+      {/* Email */}
+            <div className="mb-2">
+              <label
+                htmlFor="emil"
+                className="block mb-2 text-sm font-medium text-gray-900"
+              >
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                autoComplete="email"
+                className={`block w-full rounded-lg p-2.5 text-sm shadow-sm bg-gray-50 
+    border ${
+      errors.email
+        ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+        : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+    } text-gray-900`}
+                {...register("email", {
+                  required: "Email is required",
+                  onChange: () => setErrorMessageResponse(""),
+                })}
+                aria-invalid={errors.email ? "true" : "false"}
+                placeholder="Your Email"
+              />
+
+              {errors.email && (
+                <div className="mt-2 rounded-md  bg-red-50 p-2">
+                  <p className="text-sm font-medium text-red-700">
+                    {errors.email.message}
+                  </p>
+                </div>
+              )}
+                 {/* added error handler wrongcdntial */}
+          {errorMessageResponse && (
+            <div className="mt-3 rounded-md border border-red-300 bg-red-50 px-3 py-2">
+              <p className="text-sm font-medium text-red-700">
+                {errorMessageResponse}
+              </p>
+            </div>
+          )}
             </div>
 
             {/* Action Buttons */}
