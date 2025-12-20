@@ -20,7 +20,13 @@ const style = {
   borderRadius: "16px",
 };
 
-export default function TransitionsModal({ open, onClose , Header , Content , onConfirm }) {
+export default function TransitionsModal({
+  open,
+  onClose,
+  Header,
+  Content,
+  onConfirm,
+}) {
   return (
     <div>
       <Modal
@@ -43,23 +49,22 @@ export default function TransitionsModal({ open, onClose , Header , Content , on
             </Typography>
             <Typography id="transition-modal-description" sx={{ mt: 2 }}>
               {Content}
-
             </Typography>
-          
+
             <Stack
               spacing={1}
               direction="row"
               useFlexGap
-              
               sx={{ flexWrap: "wrap", mt: 2 }}
             >
-            <Button variant="contained" 
-            onClick={onConfirm}
-            >Confirm</Button>
+              <Button variant="contained" color="success" onClick={onConfirm}>
+                Confirm
+              </Button>
 
-              <Button
-                onClick={onClose}
-              variant="outlined">Cancel</Button>
+              <Button color="error"
+               onClick={onClose} variant="contained">
+                Cancel
+              </Button>
             </Stack>
           </Box>
         </Fade>

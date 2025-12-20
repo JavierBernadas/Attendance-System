@@ -14,6 +14,8 @@ import CreateUser from "../components/Modal/CreateUser";
 import TextField from "@mui/material/TextField";
 import ErrorNotif from "../components/Modal/ErrorNotif";
 import { Button } from "@mui/material";
+import DefaultModal from "../components/Modal/DefaultModal";
+
 import {
   notifySuccess,
   notifyError,
@@ -49,15 +51,19 @@ const columns = [
 
 export default function Users() {
   const [user, setUser] = useState(null);
+  const [userID, setUserID] = useState(null);
+
   const [countList, setCountList] = useState(0);
   const [page, setPage] = React.useState(0);
   const [loading, setLoading] = useState(true);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const STORED_TOKEN = localStorage.getItem("token");
-  const [createModal, setCreateModal] = useState(false);
+  const [isCreateModal, setIsCreateModal] = useState(false);
   const [search, setSearch] = React.useState("");
   const [open, setOpen] = React.useState(false);
   const [errorMessageResponse, setErrorMessageResponse] = useState("");
+  const [isloadingCreateUser, setIsloadingCreateUsertLoading] = useState(true);
+  const [isDeleteUser , setIsDeleteUser] = useState(false)
 
   const handleChangePage = (event, new_page) => {
     console.log(" newPage : ", new_page);
@@ -79,7 +85,7 @@ export default function Users() {
 
   // Modal Form to Create User !
   const toggleCreateModal = () => {
-    setCreateModal(true);
+    setIsCreateModal(true);
   };
 
   // Fetch Users !
@@ -116,42 +122,19 @@ export default function Users() {
     }
   };
 
-  // Generate Tem Password for User !
-  const GenerateTempPassword = (length = 10) => {
-    return Math.random()
-      .toString(36)
-      .slice(2, 2 + length);
-  };
-  console.log("errorMessageResponse : " , errorMessageResponse)
+  console.log("errorMessageResponse : ", errorMessageResponse);
   // Crete new User !
-  const NewCreatedUser = async (user_inputs) => {
-    console.log("user_inputs : " , user_inputs)
+  const NewCreatedUser = async  (user_inputs) => {
+
+    setIsloadingCreateUsertLoading(true);
+
+    console.log("user_inputs : ", user_inputs);
+
     // wait setErrorMessageResponse("TEST LANG ")
-
-
-    // this condition is need to removed handler error is already in the form ! 
-    // if (!user_inputs) {
-    //   console.error("NewCreatedUser: No user data provided.");
-    //   notifyError("No user data provided!");
-    //   return;
-    // }
-
-    // const tempPassword = GenerateTempPassword(10);
-    // console.log("Generated Temporary Password: ", tempPassword);
-
-    // const payLoad = {
-    //   firstName: user_value.firstName,
-    //   lastName: user_value.lastName,
-    //   age: user_value.age,
-    //   role: user_value.role,
-    //   email: user_value.email,
-    //   password: tempPassword,
-    // };
-
-    // console.log("Prepared Payload to API:", payLoad);
 
     try {
       // Call API to create user
+
       const response = await UserAPI.CreateUser(STORED_TOKEN, user_inputs);
       console.log("response : ", response);
 
@@ -173,23 +156,33 @@ export default function Users() {
       // 4️⃣ Delay before refresh
       setTimeout(() => {
         UserData(page + 1, rowsPerPage, "");
-      }, 5000);
-    setCreateModal(false);
+      }, 3000);
 
+      setIsCreateModal(false);
 
       // return API response if needed
     } catch (error) {
       console.error("Error creating user:", error);
       setErrorMessageResponse(error);
       // notifyError(error);
+    } finally {
+      setIsloadingCreateUsertLoading(false);
     }
-
   };
 
-  const HandleDelete = async (user_id) => {
-    try {
-      console.log(user_id);
-      const response = await UserAPI.DeleteUser(STORED_TOKEN, user_id);
+  const ConfirmTtoDeleteUser = (user_id) => {
+
+    console.log("ID to Delete : " , user_id)
+    setIsDeleteUser(true)
+    setUserID(user_id)
+  
+  };
+  const HandleDelete = async ()=>
+  {
+      console.log("userID : " ,userID)
+        try {
+      console.log(userID);
+      const response = await UserAPI.DeleteUser(STORED_TOKEN, userID);
 
       console.log(response, "HAHAHA");
 
@@ -208,14 +201,17 @@ export default function Users() {
       // Wait a bit so toast is visible before re-render
       setTimeout(() => {
         UserData(1, rowsPerPage, "");
-      }, 5000);
+      }, 2000);
 
-      console.log(response);
     } catch (error) {
       console.error("Error Delete user:", error);
-      notifyError(error);
+      notifyError(error.message);
     }
-  };
+    finally{
+      setIsDeleteUser(false)
+
+    }
+  }
 
   // useEffect for the data to render this page and display !
   useEffect(() => {
@@ -236,8 +232,6 @@ export default function Users() {
         <CircularProgress disableShrink />
       </div>
     );
-
-  if (!user) return <p>No user data</p>;
 
   return (
     <div className=" ">
@@ -299,7 +293,7 @@ export default function Users() {
                               variant="contained"
                               color="error"
                               size="small"
-                              onClick={() => HandleDelete(row._id)}
+                              onClick={() => ConfirmTtoDeleteUser(row._id)}
                             >
                               Delete
                             </Button>
@@ -335,22 +329,34 @@ export default function Users() {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
-      
       </Paper>
-        {/* modal to create invite user !  */}
-        <CreateUser
-          open={createModal}
-          onClose={() => setCreateModal(false)}
-          newUserData={NewCreatedUser}
-          apiErrorMEssage={errorMessageResponse}
-        />
+      {/* modal to create invite user !  */}
+      <CreateUser
+        open={isCreateModal} // true flase !
+        onClose={() => setIsCreateModal(false)} // direct function !
+        newUserData={NewCreatedUser} // Pass Fucntion to Send Data
+        apiErrorMEssage={errorMessageResponse} // send error message
+        setLoadingStatus={isloadingCreateUser} // status true/false
+      />
+      {/* delete confirmation  */}
+      <DefaultModal
+      open={isDeleteUser}
+      onClose={()=> setIsDeleteUser(false)}
+      Header="Delete this User"
+      Content="Are you sure to delete this user ?"
+      onConfirm={HandleDelete}
+      
+      />
+      {/* { open, onClose , Header , Content , onConfirm } */}
 
+      {/* modal error for expired token */}
       <ErrorNotif
         open={open}
         clickHandleOpen={() => setOpen(true)}
         clickHandleClose={() => setOpen(false)}
       />
 
+      {/* toast message notifications */}
       <ToastContainer />
     </div>
   );

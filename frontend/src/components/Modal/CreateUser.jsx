@@ -20,7 +20,13 @@ const style = {
   borderRadius: "10px",
 };
 
-export default function CreateUser({ open, onClose, newUserData , apiErrorMEssage }) {
+export default function CreateUser({
+  open,
+  onClose,
+  newUserData,
+  apiErrorMEssage,
+  isLoadingStatus,
+}) {
   // const [formData, setFormData] = useState({
   //   firstName: "",
   //   lastName: "",
@@ -35,7 +41,7 @@ export default function CreateUser({ open, onClose, newUserData , apiErrorMEssag
     watch,
     formState: { errors },
   } = useForm();
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
   const [errorMessageResponse, setErrorMessageResponse] = useState("");
 
   // Generate Tem Password for User !
@@ -48,16 +54,16 @@ export default function CreateUser({ open, onClose, newUserData , apiErrorMEssag
   const onSubmit = async (user_inputs, event) => {
     event.preventDefault(); // prevent refresh form !
     const tempPassword = GenerateTempPassword(10);
-const USER_DATA = {
-  ...user_inputs,
-  password: tempPassword,
-};
-setErrorMessageResponse(apiErrorMEssage)
-    console.log("USER_DATA : " ,USER_DATA )
-    newUserData(USER_DATA)
+    const USER_DATA = {
+      ...user_inputs,
+      password: tempPassword,
+    };
+    setErrorMessageResponse(apiErrorMEssage);
+    console.log("USER_DATA : ", USER_DATA);
+    newUserData(USER_DATA);
     // setIsLoading(true);
   };
-console.log("errorMessageResponse Create use : " , errorMessageResponse)
+  console.log("errorMessageResponse Create use : ", errorMessageResponse);
   return (
     <Modal
       aria-labelledby="transition-modal-title"
@@ -230,8 +236,8 @@ console.log("errorMessageResponse Create use : " , errorMessageResponse)
               )}
             </div>
 
-      {/* Email */}
-            <div className="mb-2">
+            {/* Email */}
+            <div className="mb-5">
               <label
                 htmlFor="emil"
                 className="block mb-2 text-sm font-medium text-gray-900"
@@ -264,14 +270,14 @@ console.log("errorMessageResponse Create use : " , errorMessageResponse)
                   </p>
                 </div>
               )}
-                 {/* added error handler wrongcdntial */}
-          {errorMessageResponse && (
-            <div className="mt-3 rounded-md border border-red-300 bg-red-50 px-3 py-2">
-              <p className="text-sm font-medium text-red-700">
-                {errorMessageResponse}
-              </p>
-            </div>
-          )}
+              {/* added error handler wrongcdntial */}
+              {errorMessageResponse && (
+                <div className="mt-3 rounded-md border border-red-300 bg-red-50 px-3 py-2">
+                  <p className="text-sm font-medium text-red-700">
+                    {errorMessageResponse}
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Action Buttons */}
@@ -281,10 +287,11 @@ console.log("errorMessageResponse Create use : " , errorMessageResponse)
               sx={{ justifyContent: "flex-end" }}
             >
               <Button
+               color="success"
                 type="submit"
-                loading={isLoading}
+                loading={isLoadingStatus}
                 // loadingIndicator="Logging in..."
-                disabled={isLoading}
+                disabled={isLoadingStatus}
                 variant="contained"
               >
                 Create
