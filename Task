@@ -47,14 +47,6 @@ By them or who created them only get the data
     - Toms = check error handler for invite user - ongoin
     - new format for user_api CreateUser
 
-
--- Create First the Create User UI - 
-    "firstName": "test1User",
-    "lastName": "test1User",
-    "age": 23,
-    "role" :"user",
-    "password": "test1User@user.com",
-    "email": "test1User@user.com",
-    "createdBy" : {
-    "userId" : "6846d4430ea6a9f490892ee0"
-    }
+- Added a NodeMailer 
+- Using javierbernadasback@gmail.com
+- Reason : Invite user send Email for Change Password !

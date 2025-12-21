@@ -287,7 +287,7 @@ export default function CreateUser({
               sx={{ justifyContent: "flex-end" }}
             >
               <Button
-               color="success"
+                color="success"
                 type="submit"
                 loading={isLoadingStatus}
                 // loadingIndicator="Logging in..."
@@ -297,7 +297,11 @@ export default function CreateUser({
                 Create
               </Button>
 
-              <Button variant="outlined" onClick={onClose}>
+              <Button variant="contained" 
+                              color="error"
+              
+              onClick={onClose}>
+              
                 Cancel
               </Button>
             </Stack>

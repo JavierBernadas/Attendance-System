@@ -63,7 +63,7 @@ export default function Users() {
   const [open, setOpen] = React.useState(false);
   const [errorMessageResponse, setErrorMessageResponse] = useState("");
   const [isloadingCreateUser, setIsloadingCreateUsertLoading] = useState(true);
-  const [isDeleteUser , setIsDeleteUser] = useState(false)
+  const [isDeleteUser, setIsDeleteUser] = useState(false);
 
   const handleChangePage = (event, new_page) => {
     console.log(" newPage : ", new_page);
@@ -124,8 +124,7 @@ export default function Users() {
 
   console.log("errorMessageResponse : ", errorMessageResponse);
   // Crete new User !
-  const NewCreatedUser = async  (user_inputs) => {
-
+  const NewCreatedUser = async (user_inputs) => {
     setIsloadingCreateUsertLoading(true);
 
     console.log("user_inputs : ", user_inputs);
@@ -138,16 +137,17 @@ export default function Users() {
       const response = await UserAPI.CreateUser(STORED_TOKEN, user_inputs);
       console.log("response : ", response);
 
-      // 1️⃣ Handle token expired
-      if (response?.error === "Not authenticated") {
-        setOpen(true); // show session expired modal
-        return;
-      }
-
-      // 2️⃣ Handle backend validation errors
+      // if not success !
       if (!response?.success) {
-        notifyError(response?.message || "Failed to create user!");
-        return;
+        if (response?.errorType == "auth") {
+          // show modal then show toast to show the error message
+          console.log("Token expired -> redirecting...Show Modal !");
+          setOpen(true);
+          throw new Error(response?.message || "Something Went Wrong");
+        }
+        if (response?.errorType == "api" || response?.errorType == "network") {
+          throw new Error(response?.message || "Something Went Wrong");
+        }
       }
 
       // 3️⃣ Show success toast FIRST before updating state
@@ -162,38 +162,39 @@ export default function Users() {
 
       // return API response if needed
     } catch (error) {
-      console.error("Error creating user:", error);
-      setErrorMessageResponse(error);
-      // notifyError(error);
+      if (error.message == "Invalid token") {
+        notifyError(error.message);
+      } else {
+        console.error("Error creating user:", error);
+        setErrorMessageResponse(error);
+      }
     } finally {
       setIsloadingCreateUsertLoading(false);
     }
   };
 
   const ConfirmTtoDeleteUser = (user_id) => {
-
-    console.log("ID to Delete : " , user_id)
-    setIsDeleteUser(true)
-    setUserID(user_id)
-  
+    console.log("ID to Delete : ", user_id);
+    setIsDeleteUser(true);
+    setUserID(user_id);
   };
-  const HandleDelete = async ()=>
-  {
-      console.log("userID : " ,userID)
-        try {
+  const HandleDelete = async () => {
+    console.log("userID : ", userID);
+    try {
       console.log(userID);
       const response = await UserAPI.DeleteUser(STORED_TOKEN, userID);
-
-      console.log(response, "HAHAHA");
-
+      console.log("hehe : ", response.message);
+      // if not success !
       if (!response?.success) {
-        throw new Error(response?.message || "Invalid credentials");
-      }
-
-      // check if token expired !
-      if (response?.error === "Not authenticated") {
-        console.log("Token expired -> redirecting...Show Modal !");
-        setOpen(true);
+        if (response?.errorType == "auth") {
+          // show modal then show toast to show the error message
+          console.log("Token expired -> redirecting...Show Modal !");
+          setOpen(true);
+          throw new Error(response?.message || "Something Went Wrong");
+        }
+        if (response?.errorType == "api" || response?.errorType == "network") {
+          throw new Error(response?.message || "Something Went Wrong");
+        }
       }
 
       notifySuccess(response?.data?.message);
@@ -202,16 +203,13 @@ export default function Users() {
       setTimeout(() => {
         UserData(1, rowsPerPage, "");
       }, 2000);
-
     } catch (error) {
       console.error("Error Delete user:", error);
       notifyError(error.message);
+    } finally {
+      setIsDeleteUser(false);
     }
-    finally{
-      setIsDeleteUser(false)
-
-    }
-  }
+  };
 
   // useEffect for the data to render this page and display !
   useEffect(() => {
@@ -340,12 +338,11 @@ export default function Users() {
       />
       {/* delete confirmation  */}
       <DefaultModal
-      open={isDeleteUser}
-      onClose={()=> setIsDeleteUser(false)}
-      Header="Delete this User"
-      Content="Are you sure to delete this user ?"
-      onConfirm={HandleDelete}
-      
+        open={isDeleteUser}
+        onClose={() => setIsDeleteUser(false)}
+        Header="Delete User"
+        Content="Are you sure you want to delete this user?"
+        onConfirm={HandleDelete}
       />
       {/* { open, onClose , Header , Content , onConfirm } */}
 
