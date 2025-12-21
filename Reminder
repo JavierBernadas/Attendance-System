@@ -13,8 +13,6 @@ first install the application for Local
 
 3. Email : npm install nodemailer
    - Every Created User or Invited Send Email for the Change Password ! 
-- javierbernadasback@gmail.com
-- using app password ! 
    
 Mongoose is for Schema 
 Express for Routing 
