@@ -22,6 +22,7 @@ const UserAPI = {
 
       //check first ! ! !
       if (!apiResponse.ok) {
+        console.log(result , "haha")
         throw new Error(result.message || "Login failed!");
       }
 
@@ -35,7 +36,7 @@ const UserAPI = {
       return {
         success: false,
         errorType: "network",
-        message: error,
+        message: error.message,
       };
     }
   },
@@ -83,7 +84,7 @@ const UserAPI = {
       return {
         success: false,
         errorType: "network",
-        message: "Unable to connect to the server.",
+        message: error.message,
       };
     }
   },
@@ -107,7 +108,7 @@ const UserAPI = {
         return {
           success: false,
           errorType: "auth",
-          message: "Not authenticated",
+         message: result.error || "Failed to create user.",
         };
       }
 
@@ -116,7 +117,7 @@ const UserAPI = {
         return {
           success: false,
           errorType: "api",
-          message: result.message || "Failed to create user.",
+          message: result.error || "Failed to create user.",
         };
       }
 
@@ -131,7 +132,7 @@ const UserAPI = {
       return {
         success: false,
         errorType: "network",
-        message: "Unable to connect to the server.",
+        message: error.message,
       };
     }
   },
@@ -152,12 +153,13 @@ const UserAPI = {
 
       const result = await apiResponse.json();
 
+        console.log("result : delete " , result)
       // 🔐 Token expired
       if (apiResponse.status === 401) {
         return {
           success: false,
           errorType: "auth",
-          message: "Not authenticated",
+          message: result.error,
         };
       }
 
@@ -166,7 +168,7 @@ const UserAPI = {
         return {
           success: false,
           errorType: "api",
-          message: result.message || "Failed to delete user.",
+          message: result.error || "Failed to delete user.",
         };
       }
 
@@ -175,13 +177,14 @@ const UserAPI = {
         success: true,
         data: result,
       };
+
     } catch (error) {
       console.error("Delete User error:", error);
 
       return {
         success: false,
         errorType: "network",
-        message: "Unable to connect to the server.",
+        message: error.message
       };
     }
   },

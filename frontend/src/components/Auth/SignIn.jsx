@@ -237,6 +237,7 @@ const SignIn = () => {
       login(token, role, userFullName);
       navigate("/main");
     } catch (error) {
+      console.log(error.message)
       // remove toast so OA HAHA !
       // notifyError(error.message || "Login failed");
       setErrorMessageResponse(error.message || "Login failed");

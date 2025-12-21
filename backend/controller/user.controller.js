@@ -1,9 +1,15 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/user.model");
+// const { GMAIL, GMAIL_PASSWORD } = require("../env");
 
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const secret = process.env.JWT_SECRET;
+const GMAIL = process.env.GMAIL;
+const GMAIL_PASSWORD = process.env.GMAIL_PASSWORD;
+
+
+const nodemailer = require("nodemailer");
 //Done
 const postUser = async (req, res) => {
   try {
@@ -48,6 +54,33 @@ const postUser = async (req, res) => {
         role: creatorRole,
       },
     };
+
+    // Email configuration
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: GMAIL,
+        pass: GMAIL_PASSWORD, // The 16-character App Password
+      },
+    });
+
+    const message = {
+      from: GMAIL,
+      to: "javiercanoy200@gmail.com",
+      subject: "Hello World",
+      text: "This is the plaintext version of the email.",
+      html: "<p>This is the <strong>HTML version</strong> of the email.</p>",
+    };
+
+    // Send email
+    transporter
+      .sendMail(message)
+      .then(() => {
+        console.log("Email sent successfully");
+      })
+      .catch((error) => {
+        console.error("Error sending email:", error);
+      });
 
     const user = await User.create(userData);
     res.status(201).json({ message: "User created successfully", user });
@@ -136,7 +169,7 @@ const getAllUsers = async (req, res) => {
 
     let filter = {};
     let search = req.query.search;
-    
+
     if (requestingUserRole === "superadmin") {
       // superadmin can see all except themselves
       filter = { _id: { $ne: currentUserId } };
@@ -147,19 +180,15 @@ const getAllUsers = async (req, res) => {
       // admin/manager can only see users they created/assigned
       filter = { "createdBy.userId": currentUserId };
     }
-    
+
     if (search) {
-  filter.$or = [
-    { firstName: { $regex: search, $options: "i" } },
-    // { lastName: { $regex: search, $options: "i" } },
-    { email: { $regex: search, $options: "i" } },
-    { role: { $regex: search, $options: "i" } }
-
-  ];
-}
-
-
-
+      filter.$or = [
+        { firstName: { $regex: search, $options: "i" } },
+        // { lastName: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+        { role: { $regex: search, $options: "i" } },
+      ];
+    }
 
     const totalUsers = await User.countDocuments(filter);
     const users = await User.find(filter)
@@ -206,7 +235,7 @@ const getMyProfile = async (req, res) => {
       data: user,
     });
   } catch (error) {
-    console.log(" Error : " , getMyProfile)
+    console.log(" Error : ", getMyProfile);
     return res.status(500).json({
       message: "Server error. Please try again later.",
     });
@@ -288,7 +317,7 @@ const updateUser = async (req, res) => {
 
     return res.status(201).json(response);
   } catch (error) {
-    console.log("Error : " ,updateUser )
+    console.log("Error : ", updateUser);
     return res
       .status(500)
       .json({ message: "Something went wrong.", error: error.message });
