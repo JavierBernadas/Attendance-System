@@ -129,8 +129,6 @@ export default function Users() {
 
     console.log("user_inputs : ", user_inputs);
 
-    // wait setErrorMessageResponse("TEST LANG ")
-
     try {
       // Call API to create user
 

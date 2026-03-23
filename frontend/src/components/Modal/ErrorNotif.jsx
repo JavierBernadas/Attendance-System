@@ -40,7 +40,7 @@ export default function ErrorNotif({ open }) {
             sx={{ display: "flex", alignItems: "center" }}
           >
             <ReportProblemIcon
-              sx={{ fontSize: 32, color: "red", mr: 2 }} // red icon + margin-right
+              sx={{ fontSize: 32, color: "red", mr: 2 }} 
             />
             Your session has expired!
           </Typography>
