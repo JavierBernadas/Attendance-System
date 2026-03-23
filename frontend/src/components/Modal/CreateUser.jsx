@@ -54,6 +54,7 @@ export default function CreateUser({
   const onSubmit = async (user_inputs, event) => {
     event.preventDefault(); // prevent refresh form !
     const tempPassword = GenerateTempPassword(10);
+    console.log("TEM Password : " + tempPassword)
     const USER_DATA = {
       ...user_inputs,
       password: tempPassword,
@@ -297,11 +298,7 @@ export default function CreateUser({
                 Create
               </Button>
 
-              <Button variant="contained" 
-                              color="error"
-              
-              onClick={onClose}>
-              
+              <Button variant="contained" color="error" onClick={onClose}>
                 Cancel
               </Button>
             </Stack>
